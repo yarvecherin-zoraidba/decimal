@@ -1,6 +1,4 @@
-
 #include <stdio.h>
-#include <limits.h>
 
 typedef struct {
     unsigned int bits[4]; 
@@ -17,3 +15,4 @@ unsigned int s21_get_exp(s21_decimal src);
 void s21_set_exp(s21_decimal *src, unsigned int exp);
 int s21_from_decimal_to_float(s21_decimal src, float *dst);
 int s21_from_float_to_decimal(float src, s21_decimal *dst);
+int s21_from_decimal_to_int(s21_decimal src, int *dst);
