@@ -1,4 +1,5 @@
 #include "s21_decimal.h"
+#include "s21_round.h"
 #include <assert.h>
 
 
@@ -22,13 +23,19 @@ int main() {
     print_decimal(result);
 
 
-    s21_decimal decimal = {0}; 
+    s21_decimal decimal = {0};
+    s21_decimal truncated_decimal = {0};  
     float res = 0.0;
     decimal.bits[0] = 1234;
     decimal.bits[1] = 0;  
     decimal.bits[2] = 0;
     decimal.bits[3] = 0; 
-    s21_from_decimal_to_float(decimal, &res);
+    //s21_from_decimal_to_float(decimal, &res);
+    print_decimal(decimal);
+    s21_set_exp(&decimal, 2);
+    s21_truncate(decimal, &truncated_decimal);
+    print_decimal(truncated_decimal);
+
     printf("%f\n", res);
     return 0;
 };
@@ -51,14 +58,14 @@ int s21_negate(s21_decimal value, s21_decimal *result) {
 
     if (result) {
         *result = value;
-        s21_set_sign(result, !s21_get_sign(value));
+        result->bits[3]^=SIGNBIT;
     } else {
         status = 1;
     }
 
     return status;
 }
-
+typedef s21_decimal* pstr;
 void s21_zero_to_hero(s21_decimal *dst) {
     dst->bits[0] = dst->bits[1] = dst->bits[2] = dst->bits[3] = 0;
 }
@@ -111,7 +118,7 @@ int s21_from_decimal_to_float(s21_decimal src, float *dst) {
 }
 
 int s21_from_float_to_decimal(float src, s21_decimal *dst) {
-
+    return 0;
 }
 
 unsigned int s21_get_exp(s21_decimal src)
