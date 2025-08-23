@@ -98,6 +98,20 @@ int main() {
     s21_from_decimal_to_int(src4, &number4);
     ck_assert_int_eq(number4, 0);
 
+	int number5 = 0;
+	s21_decimal src5 = {{0, 1, 0, 0}};
+	int status = s21_from_decimal_to_int(src5, &number5);
+	s21_from_decimal_to_int(src5, &number5);
+	ck_assert_int_eq(number5, 0);
+	ck_assert_int_eq(status, 1);
+
+	int number6 = 0;
+	s21_decimal src6 = {{12345, 0, 0, (2 << 16)}};
+	int status1 = s21_from_decimal_to_int(src6, &number6);
+	s21_from_decimal_to_int(src6, &number6);
+	ck_assert_int_eq(number6, 123);
+	ck_assert_int_eq(status1, 0);	
+
   }
   END_TEST
 
