@@ -10,7 +10,7 @@ void s21_long_mul(s21_long_decimal value1, s21_long_decimal value2,
                   s21_long_decimal *result);
 s21_decimal s21_decimal_init();
 s21_long_decimal s21_long_init();
-void s21_decimal_to_long(s21_decimal value, s21_long_decimal *result);
+void s21_decimal_to_long_decimal(s21_decimal value, s21_long_decimal *result);
 void s21_long_float_check(s21_long_decimal *value_1, s21_long_decimal *value_2);
 int s21_long_comparison(s21_long_decimal value_1, s21_long_decimal value_2);
 void s21_long_add(s21_long_decimal value_1, s21_long_decimal value_2,

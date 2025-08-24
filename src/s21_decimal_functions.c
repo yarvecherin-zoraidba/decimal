@@ -19,7 +19,7 @@ s21_long_decimal s21_long_init() {
   return value;
 }
 
-void s21_decimal_to_long(s21_decimal value, s21_long_decimal *result) {
+void s21_decimal_to_long_decimal(s21_decimal value, s21_long_decimal *result) {
   *result = s21_long_init();
   char *val_byte = (char *)value.bits;
   result->floa = *(val_byte + 14);

@@ -5,7 +5,7 @@
 
 typedef struct
 {
-    int bits[4];
+    unsigned int bits[4];
 } s21_decimal;
 
 typedef struct

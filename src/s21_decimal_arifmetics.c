@@ -7,8 +7,8 @@ int s21_add(s21_decimal value1, s21_decimal value2, s21_decimal *result) {
   s21_long_decimal longValue1;
   s21_long_decimal longValue2;
   s21_long_decimal longResult = s21_long_init();
-  s21_decimal_to_long(value1, &longValue1);
-  s21_decimal_to_long(value2, &longValue2);
+  s21_decimal_to_long_decimal(value1, &longValue1);
+  s21_decimal_to_long_decimal(value2, &longValue2);
 
   s21_long_float_check(&longValue1, &longValue2);
 
@@ -38,8 +38,8 @@ int s21_sub(s21_decimal value1, s21_decimal value2, s21_decimal *result) {
   s21_long_decimal longValue1;
   s21_long_decimal longValue2;
   s21_long_decimal longResult = s21_long_init();
-  s21_decimal_to_long(value1, &longValue1);
-  s21_decimal_to_long(value2, &longValue2);
+  s21_decimal_to_long_decimal(value1, &longValue1);
+  s21_decimal_to_long_decimal(value2, &longValue2);
 
   s21_long_float_check(&longValue1, &longValue2);
 
@@ -69,8 +69,8 @@ int s21_mul(s21_decimal value1, s21_decimal value2, s21_decimal *result) {
   s21_long_decimal longValue1;
   s21_long_decimal longValue2;
   s21_long_decimal longResult = s21_long_init();
-  s21_decimal_to_long(value1, &longValue1);
-  s21_decimal_to_long(value2, &longValue2);
+  s21_decimal_to_long_decimal(value1, &longValue1);
+  s21_decimal_to_long_decimal(value2, &longValue2);
   int sign1 = longValue1.sign;
   int sign2 = longValue2.sign;
 
