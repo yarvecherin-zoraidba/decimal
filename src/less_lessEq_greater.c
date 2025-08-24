@@ -36,11 +36,11 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
         _Bool fl_num_result_is_zero = 1;
 
         if (value_2.bits[2] != 0U) {
-            while (fl_num_value_1_is_zero == 0 && fl_result_is_overflow == 0) {
-                if (fl_num_v1_less_v2 == 1) {
+            if (fl_num_v1_less_v2 == 1) {
                     overflow = change_num_by_mul_10(&value_1, 1);
                     ex_result++;
                 }
+            while (fl_num_value_1_is_zero == 0 && fl_result_is_overflow == 0) {
                 overflow = (overflow << 32) | value_1.bits[2];
                 unsigned quotient = (unsigned)(overflow / (unsigned long long)value_2.bits[2]);
                 remainder = (unsigned long long)(overflow % (unsigned long long)value_2.bits[2]);
@@ -75,7 +75,7 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
                     
                 //ф-я вычитания из value_1.bit[1], учитывая необходимость вычитания из bit[2], если вычитаемое больше bit[1]:
 
-                //ф-я вычитания из value_1.bit[2], учитывая необходимость * 10 (ex_res++), если вычитаемое больше bit[2]:
+                //ф-я вычитания из overflow, учитывая необходимость * 10 (ex_res++), если вычитаемое больше overflow:
 
                 //ф-я провекри для fl_num_value_1_is_zero:
                 
