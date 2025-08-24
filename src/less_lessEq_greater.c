@@ -19,30 +19,31 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     int ex1 = (int)(value_1.bits[3] & EXBITS) >> 16;
     int ex2 = (int)(value_2.bits[3] & EXBITS) >> 16;
     ex2 = remove_zero_if_div_10(&value_2, ex2);
+    int ex_result = 0;
+    _Bool fl_num_v1_less_v2 = 0;
     if (value_2.bits[0] == 0U && value_2.bits[1] == 0U && value_2.bits[2] == 0U) {
         res = 3;
     } else if (value_1.bits[0] == 0 && value_1.bits[1] == 0 && value_1.bits[2] == 0) {
-    } else if (make_num_v1_greater_v2(&value_1, &ex1, value_2) == -1) {
-        res = 2;
+    } else if ((ex_result = make_ex_1_2_zero(&value_1, &value_2, &ex1, &ex2)) < 0) {
+        res = ((result->bits[3] & SIGNBIT) == 0U) ? 1 : 2;
+    } else if ((fl_num_v1_less_v2 = make_num_v1_greater_v2(&value_1, &ex_result, value_2)) == -1) {
+        res = 0; // или res = 2 или res = 0 со значением result без изменений(0,0,0,res->bit[3]). Как понять фразу "Число слишком мало или равно отрицательной бесконечности". Число мало, это число близкое к нулю, но не ноль, или все же имеется ввиду значение MAX,MAX,MAX,28 cо знаком "-"?
     } else {
-        int ex_result = make_ex_1_2_zero(&value_1, &value_2, &ex1, &ex2);
         unsigned long long remainder = 0U;
         unsigned long long overflow = 0ULL;
         _Bool fl_result_is_overflow = 0;
         _Bool fl_num_value_1_is_zero = 0;
         _Bool fl_num_result_is_zero = 1;
-        // unsigned long long temp_1 = (value_1.bits[2] << 32) | value_1.bits[1];
-        // unsigned long long temp_2 = (value_2.bits[2] << 32) | value_2.bits[1];
-        // if (temp_2 != 0ULL) {
-        //     temp = temp_1 / temp_2;
-        // }
 
-        // for (int i = 3; i <= 0 &&
-        
         if (value_2.bits[2] != 0U) {
             while (fl_num_value_1_is_zero == 0 && fl_result_is_overflow == 0) {
-                unsigned quotient = value_1.bits[2] / value_2.bits[2];
-                remainder = (unsigned long long)(value_1.bits[2] % value_2.bits[2]);
+                if (fl_num_v1_less_v2 == 1) {
+                    overflow = change_num_by_mul_10(&value_1, 1);
+                    ex_result++;
+                }
+                overflow = (overflow << 32) | value_1.bits[2];
+                unsigned quotient = (unsigned)(overflow / (unsigned long long)value_2.bits[2]);
+                remainder = (unsigned long long)(overflow % (unsigned long long)value_2.bits[2]);
                 unsigned long long over_remainder = ((unsigned long long)value_2.bits[0] * (unsigned long long)quotient) >> 32;
                 over_remainder = ((unsigned long long)value_2.bits[1] * (unsigned long long)quotient + over_remainder) >> 32;
                 if (over_remainder > remainder) {
@@ -54,9 +55,9 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
                     fl_num_result_is_zero = 0;
                 } else if (ex_result < 28) {
                     s21_decimal temp_result = *result;
-                    fl_result_is_overflow = change_num_by_mul_10(&temp_result, 1);
+                    fl_result_is_overflow = (change_num_by_mul_10(&temp_result, 1) != 0ULL);
                     if (fl_result_is_overflow == 0) {
-                        fl_result_is_overflow = add_digit();
+                        fl_result_is_overflow = add_digit(result, quotient);
                     }
                     if (fl_result_is_overflow == 0) {
                         *result = temp_result;
@@ -95,9 +96,9 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
             //     if (overflow > remainder) {
             //         result->bits[2]--;
             //         remainder += (unsigned long long)value_2.bits[2];
-                }
-            }
-        }
+                // }
+            // }
+        result->bits[3] |= (ex_result << 16);
     }
 
             // for (int b = 31; b <= 0; b--) {
@@ -166,10 +167,10 @@ int get_res_of_comparison(s21_decimal v1, s21_decimal v2) {
         int ex1 = (v1.bits[3] & EXBITS) >> 16;
         int ex2 = (v2.bits[3] & EXBITS) >> 16;
         if (ex1 < ex2) {
-                res = (int)change_num_by_mul_10(&v1, ex2 - ex1);
+                res = (int)(change_num_by_mul_10(&v1, ex2 - ex1) != 0ULL);
                 res = (res == 1) ? 1 : compare_with_same_ex(v1, v2);
         } else if (ex1 > ex2) {
-                res = (int)change_num_by_mul_10(&v2, ex1 - ex2);
+                res = (int)(change_num_by_mul_10(&v2, ex1 - ex2) != 0ULL);
                 res = (res == 1) ? -1 : compare_with_same_ex(v1, v2);
         } else {
             res = compare_with_same_ex(v1, v2);
@@ -199,25 +200,23 @@ int compare_with_same_ex(s21_decimal v1, s21_decimal v2) {
     return res;
 }
 
-int make_num_v1_greater_v2(s21_decimal *v1, int *ex1, s21_decimal v2) {
+int make_num_v1_greater_v2(s21_decimal *v1, int *ex_result, s21_decimal v2) {
     int res = 0;
     if (v1 != NULL) {
         s21_decimal v1_temp = *v1;
-        while ((compare_with_same_ex(v1_temp, v2) == -1) && (res != -1)) {
-            if ((change_num_by_mul_10(&v1_temp, 1) != 1) && (*ex1 < 28)) {
+        while ((compare_with_same_ex(v1_temp, v2) == -1) && (res == 0)) {
+            if ((change_num_by_mul_10(&v1_temp, 1) == 0ULL) && (*ex_result < 28)) {
                 *v1 = v1_temp;
-                (*ex1)++;
+                (*ex_result)++;
             } else {
-                res = -1;
+                res = (*ex_result >= 28) ? -1 : 1;
             }
         }
-        v1->bits[3] &= SIGNBIT;
-        v1->bits[3] |= (*ex1 << 16);
     }
     return res;
 }
 
-_Bool change_num_by_mul_10(s21_decimal *v, int delta_ex) {
+unsigned long long change_num_by_mul_10(s21_decimal *v, int delta_ex) {
     unsigned long long overflow = 0ULL;
     for (int d = delta_ex; d > 0 && overflow == 0ULL; d--) {
         for (int i = 0; i < 3; i++) {
@@ -226,7 +225,7 @@ _Bool change_num_by_mul_10(s21_decimal *v, int delta_ex) {
             overflow = overflow >> 32;
         }
     }
-    return (overflow != 0ULL);
+    return overflow;
 }
 
 int s21_negate(s21_decimal value, s21_decimal *result) {
@@ -273,8 +272,27 @@ int divide_by_10(s21_decimal *v) {
     return rem;
 }
 
-int make_ex_1_2_zero(s21_decimal *value_1, s21_decimal *value_2, int *ex1, int *ex2) {
-    int ex_result = 0;
-
+int make_ex_1_2_zero(s21_decimal *v1, s21_decimal *v2, int *ex1, int *ex2) {
+    int ex_result = *ex1 - *ex2;
+    _Bool fl_overflow_v1 = 0;
+    if (ex_result < 0) {
+        fl_overflow_v1 = (change_num_by_mul_10(v1, -ex_result) != 0ULL);
+    }
+    if (fl_overflow_v1 == 0) {
+        ex_result = 0;
+    }
+    *ex1 = *ex2 = 0;
+    v1->bits[3] &= (~EXBITS);
+    v2->bits[3] &= (~EXBITS);
     return ex_result;
+}
+
+_Bool add_digit(s21_decimal *v, unsigned quotient) {
+    unsigned long long overflow = 0ULL;
+    for (int i = 0; i < 3; i++) {
+        overflow += ((unsigned long long)v->bits[i] + (unsigned long long)quotient);
+        v->bits[i] = (unsigned)overflow;
+        overflow = overflow >> 32;
+    }
+    return (overflow != 0ULL);
 }

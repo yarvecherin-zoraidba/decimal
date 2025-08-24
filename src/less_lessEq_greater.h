@@ -21,7 +21,7 @@ int s21_is_not_equal(s21_decimal v1, s21_decimal v2);
 int get_res_of_comparison(s21_decimal v1, s21_decimal v2);
 int compare_with_same_ex(s21_decimal v1, s21_decimal v2);
 int make_num_v1_greater_v2(s21_decimal *v1, int *ex1, s21_decimal v2);
-_Bool change_num_by_mul_10(s21_decimal *v, int delta_ex);
+unsigned long long change_num_by_mul_10(s21_decimal *v, int delta_ex);
 int remove_zero_if_div_10(s21_decimal *v, int delta_ex);
 int divide_by_10(s21_decimal *v);
 
