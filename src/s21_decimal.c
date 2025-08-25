@@ -25,7 +25,6 @@ int main() {
     decimal.bits[3] = 0; 
 
     s21_set_exp(&decimal, 2);
-    //s21_set_sign(&decimal, 1);
     print_decimal(decimal);
     s21_round(decimal, &rounded_decimal);
     s21_floor(decimal, &floored_decimal);

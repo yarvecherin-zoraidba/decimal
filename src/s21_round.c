@@ -81,12 +81,9 @@ _Bool add_digit(s21_decimal *value, unsigned digit) {
 
 void remove_leading_zeros(s21_decimal *value) {
   int scale = s21_get_exp(*value);
-  printf("%d\n", scale);
   while ((scale != 0) && (value->bits[0] % 10 == 0)) {
-    printf("%d\n", scale);
     s21_divide_by_10(value);
     scale--;
   };
-  printf("%d\n", scale);
   s21_set_exp(value, scale);
 }
