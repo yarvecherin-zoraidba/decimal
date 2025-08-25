@@ -2,8 +2,7 @@
 #include "s21_round.h"
 #include <assert.h>
 
-
-#define SIGNBIT 0x80000000 
+#define SIGNBIT 0x80000000
 
 void print_decimal(s21_decimal d) {
     printf("bits[0]: %u\n", d.bits[0]);
@@ -15,28 +14,25 @@ void print_decimal(s21_decimal d) {
 
 int main() {
     s21_decimal result;
-    int boom = 6789;
-    int status = s21_from_int_to_decimal(boom, &result);
-
-    printf("%d\n", result.bits[0]);
-    printf("%d\n", result.bits[3]);
-    print_decimal(result);
-
-
     s21_decimal decimal = {0};
     s21_decimal truncated_decimal = {0};  
-    float res = 0.0;
-    decimal.bits[0] = 1234;
+    s21_decimal rounded_decimal = {0};
+    s21_decimal floored_decimal = {0};
+
+    decimal.bits[0] = 124500;
     decimal.bits[1] = 0;  
     decimal.bits[2] = 0;
     decimal.bits[3] = 0; 
-    //s21_from_decimal_to_float(decimal, &res);
-    print_decimal(decimal);
+
     s21_set_exp(&decimal, 2);
+    //s21_set_sign(&decimal, 1);
+    print_decimal(decimal);
+    s21_round(decimal, &rounded_decimal);
+    s21_floor(decimal, &floored_decimal);
     s21_truncate(decimal, &truncated_decimal);
     print_decimal(truncated_decimal);
-
-    printf("%f\n", res);
+    print_decimal(rounded_decimal);
+    print_decimal(floored_decimal);
     return 0;
 };
 
