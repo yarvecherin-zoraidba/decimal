@@ -1,6 +1,4 @@
 #include "s21_decimal.h"
-#include <math.h>
-
 
 int s21_get_sign(s21_decimal src) {
     return (src.bits[3] & SIGNBIT) ? 1 : 0;
