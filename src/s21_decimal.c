@@ -12,28 +12,28 @@ void print_decimal(s21_decimal d) {
     printf("Знак: %s\n", (d.bits[3] & SIGNBIT) ? "Отрицательный" : "Положительный");
 }
 
-int main() {
-    s21_decimal result;
-    s21_decimal decimal = {0};
-    s21_decimal truncated_decimal = {0};  
-    s21_decimal rounded_decimal = {0};
-    s21_decimal floored_decimal = {0};
+// int main() {
+//     s21_decimal result;
+//     s21_decimal decimal = {0};
+//     s21_decimal truncated_decimal = {0};  
+//     s21_decimal rounded_decimal = {0};
+//     s21_decimal floored_decimal = {0};
 
-    decimal.bits[0] = 124500;
-    decimal.bits[1] = 0;  
-    decimal.bits[2] = 0;
-    decimal.bits[3] = 0; 
+//     decimal.bits[0] = 124500;
+//     decimal.bits[1] = 0;  
+//     decimal.bits[2] = 0;
+//     decimal.bits[3] = 0; 
 
-    s21_set_exp(&decimal, 2);
-    print_decimal(decimal);
-    s21_round(decimal, &rounded_decimal);
-    s21_floor(decimal, &floored_decimal);
-    s21_truncate(decimal, &truncated_decimal);
-    print_decimal(truncated_decimal);
-    print_decimal(rounded_decimal);
-    print_decimal(floored_decimal);
-    return 0;
-};
+//     s21_set_exp(&decimal, 2);
+//     print_decimal(decimal);
+//     s21_round(decimal, &rounded_decimal);
+//     s21_floor(decimal, &floored_decimal);
+//     s21_truncate(decimal, &truncated_decimal);
+//     print_decimal(truncated_decimal);
+//     print_decimal(rounded_decimal);
+//     print_decimal(floored_decimal);
+//     return 0;
+// };
 
 int s21_get_sign(s21_decimal src) {
     return (src.bits[3] & SIGNBIT) ? 1 : 0;

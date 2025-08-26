@@ -2,21 +2,28 @@
 #include  <stdbool.h>
 
 int s21_floor(s21_decimal value, s21_decimal *result) {
-  int error = 0;
-  int largest_fractional_part = 0;
   unsigned int scale = s21_get_exp(value);
 
-  if (scale != 0) {
-    *result = value;
-    remove_leading_zeros(result);
-    scale = s21_get_exp(*result);
-    if (s21_get_sign(*result) == 0) {
-      s21_truncate(*result, result);
-    } else {
-      while ((scale--) != 0) {
-      largest_fractional_part = s21_divide_by_10(result);
+  if (result == NULL) return 1;
+  if (scale > 28) return 1;
+
+  int error = 0;
+  int largest_fractional_part = 0;
+
+
+  *result = value;
+  remove_leading_zeros(result);
+  scale = s21_get_exp(*result);
+  if (s21_get_sign(*result) == 0) {
+    s21_truncate(*result, result);
+  } else {
+    if (scale > 0) {
+      while (scale != 0) {
+        largest_fractional_part = s21_divide_by_10(result);
+        s21_set_exp(result, 0);
+        scale--;
       }
-      add_digit(result, 1);
+    add_digit(result, 1);
     }
   }
   
@@ -25,8 +32,11 @@ int s21_floor(s21_decimal value, s21_decimal *result) {
 
 
 int s21_round(s21_decimal value, s21_decimal *result) {
-  int error = 0;
   unsigned int scale = s21_get_exp(value);
+  if (result == NULL) return 1;
+  if (scale > 28) return 1;
+  int error = 0;
+  
   int largest_fractional_part = 0;
   *result = value;
 
@@ -40,6 +50,8 @@ int s21_round(s21_decimal value, s21_decimal *result) {
 }
 
 int s21_truncate(s21_decimal value, s21_decimal *result) {
+  if (result == NULL) return 1;
+
   int scale = s21_get_exp(value);
   if (scale > 28) return 1;
 
