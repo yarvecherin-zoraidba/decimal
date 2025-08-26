@@ -22,8 +22,8 @@ int s21_add(s21_decimal value1, s21_decimal value2, s21_decimal *result) {
   }
   int exp1 = s21_get_exponent(value1);
   int exp2 = s21_get_exponent(value2);
-  int max_exp = (exp1 > exp2) ? exp1 : exp2;
 
+  int max_exp = (exp1 > exp2) ? exp1 : exp2;
   s21_decimal aligned1 = value1;
   s21_decimal aligned2 = value2;
 
