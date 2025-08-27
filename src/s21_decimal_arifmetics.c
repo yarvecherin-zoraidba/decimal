@@ -9,8 +9,8 @@ int s21_add(s21_another_decimal value1, s21_another_decimal value2, s21_another_
     *result = s21_decimal_init();
     int error = 0;
     
-    // Обрабатываем разные знаки - преобразуем в вычитание
-    if (value1.sign ^ value2.sign) {
+    // Разные знаки -> вычитание
+    if (value1.sign != value2.sign) {
         if (value1.sign) {
             value1.sign = 0;
             error = s21_sub(value2, value1, result);
@@ -18,50 +18,45 @@ int s21_add(s21_another_decimal value1, s21_another_decimal value2, s21_another_
             value2.sign = 0;
             error = s21_sub(value1, value2, result);
         }
-        return error; // ВАЖНО: возвращаемся сразу после вычитания
+        return error;
     }
     
     // Выравниваем экспоненты
-    int exp1 = s21_get_exponent(value1);
-    int exp2 = s21_get_exponent(value2);
-    int max_exp = (exp1 > exp2) ? exp1 : exp2;
-    
     s21_another_decimal aligned1 = value1;
     s21_another_decimal aligned2 = value2;
-    s21_align_exponents(&aligned1, &aligned2);
     
-    // Сложение с учетом переносов
-    unsigned long long sum = 0;
+    error = s21_align_exponents(&aligned1, &aligned2);
+    if (error) return error; // Если выравнивание не удалось
+    
+    int exp = s21_get_exponent(aligned1); // Теперь они одинаковые
+    
+    // Сложение
     unsigned long long carry = 0;
-    
     for (int i = 0; i < 3; i++) {
-        sum = (unsigned long long)aligned1.bits[i] + 
-              (unsigned long long)aligned2.bits[i] + 
-              carry;
+        unsigned long long sum = (unsigned long long)aligned1.bits[i] + 
+                                (unsigned long long)aligned2.bits[i] + carry;
         carry = sum >> 32;
         result->bits[i] = (unsigned int)(sum & 0xFFFFFFFF);
     }
     
-    // Обрабатываем переполнение
-    if (carry > 0) {
-        if (max_exp > 0) {
-            // Пытаемся уменьшить масштаб
+    // Обработка переполнения
+    if (carry) {
+        if (exp > 0) {
+            // Делим на 10 и уменьшаем экспоненту
             s21_another_decimal temp = *result;
-            s21_set_exponent(&temp, max_exp);
+            s21_set_exponent(&temp, exp);
             error = s21_div_by_10(&temp, result);
             if (!error) {
-                s21_set_exponent(result, max_exp - 1);
+                s21_set_exponent(result, exp - 1);
             }
         } else {
             error = 1; // Переполнение
         }
     } else {
-        s21_set_exponent(result, max_exp);
+        s21_set_exponent(result, exp);
     }
     
-    // Устанавливаем знак (оба числа имеют одинаковый знак)
     result->sign = value1.sign;
-    
     return error;
 }
 
@@ -120,17 +115,29 @@ int s21_sub(s21_another_decimal value1, s21_another_decimal value2, s21_another_
   return error;
 }
 
-void s21_align_exponents(s21_another_decimal *a, s21_another_decimal *b) {
-  int exp1 = s21_get_exponent(*a);
-  int exp2 = s21_get_exponent(*b);
-
-  if (exp1 < exp2) {
-    s21_multiply_by_10_power(a, exp2 - exp1);
-    s21_set_exponent(a, exp2);
-  } else if (exp2 < exp1) {
-    s21_multiply_by_10_power(b, exp1 - exp2);
-    s21_set_exponent(b, exp1);
-  }
+int s21_align_exponents(s21_another_decimal *a, s21_another_decimal *b) {
+    if (!a || !b) return 1; // Проверка на NULL
+    
+    int exp1 = s21_get_exponent(*a);
+    int exp2 = s21_get_exponent(*b);
+    
+    if (exp1 == exp2) return 0; // Уже выровнены
+    
+    int error = 0;
+    
+    if (exp1 < exp2) {
+        error = s21_multiply_by_10_power(a, exp2 - exp1);
+        if (!error) {
+            s21_set_exponent(a, exp2);
+        }
+    } else {
+        error = s21_multiply_by_10_power(b, exp1 - exp2);
+        if (!error) {
+            s21_set_exponent(b, exp1);
+        }
+    }
+    
+    return error;
 }
 
 int s21_multiply_by_10_power(s21_another_decimal *value, int power) {
