@@ -177,24 +177,28 @@ void s21_set_exponent(s21_another_decimal *src, unsigned int exp) {
 }
 
 int s21_shift_left(s21_another_decimal *value, int shift) {
-    if (!value || shift < 0) return 1;
-    if (shift == 0) return 0;
-    
     int error = 0;
-    unsigned int final_carry = 0;
     
-    for (int s = 0; s < shift && !error; s++) {
-        unsigned int carry_prev = 0;
+    if (!value || shift < 0) {
+        error = 1;
+    } else if (shift == 0) {
+        error = 0;
+    } else {
+        unsigned int final_carry = 0;
         
-        for (int i = 0; i < 3; i++) {
-            unsigned int current = value->bits[i];
-            value->bits[i] = (current << 1) | carry_prev;
-            carry_prev = (current >> 31) & 1;
-        }
-        
-        if (carry_prev != 0) {
-            final_carry = carry_prev;
-            error = 1;
+        for (int s = 0; s < shift && !error; s++) {
+            unsigned int carry_prev = 0;
+            
+            for (int i = 0; i < 3; i++) {
+                unsigned int current = value->bits[i];
+                value->bits[i] = (current << 1) | carry_prev;
+                carry_prev = (current >> 31) & 1;
+            }
+            
+            if (carry_prev != 0) {
+                final_carry = carry_prev;
+                error = 1;
+            }
         }
     }
     
