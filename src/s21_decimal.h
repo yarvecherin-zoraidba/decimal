@@ -22,6 +22,6 @@ int s21_div_by_10(s21_another_decimal *value, s21_another_decimal *result);
 int s21_compare_absolute(s21_another_decimal a, s21_another_decimal b);
 unsigned int s21_get_exponent(s21_another_decimal src);
 void s21_set_exponent(s21_another_decimal *src, unsigned int exp);
-void s21_shift_left(s21_another_decimal *value, int shift);
+int s21_shift_left(s21_another_decimal *value, int shift);
 
 #endif

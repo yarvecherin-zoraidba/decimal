@@ -11,10 +11,10 @@ int s21_add(s21_another_decimal value1, s21_another_decimal value2, s21_another_
   if (value1.sign ^ value2.sign) {
     if (value1.sign) {
       value1.sign = 0;
-      return s21_sub(value2, value1, result);
+      error = s21_sub(value2, value1, result);
     } else {
       value2.sign = 0;
-      return s21_sub(value1, value2, result);
+      error = s21_sub(value1, value2, result);
     }
   }
   int exp1 = s21_get_exponent(value1);
@@ -42,7 +42,7 @@ int s21_add(s21_another_decimal value1, s21_another_decimal value2, s21_another_
     if (max_exp > 0) {
       s21_another_decimal temp = *result;
       s21_set_exponent(result, max_exp - 1);
-      error = s21_div_by_10(&temp, result);
+      error = (s21_div_by_10(&temp, result) ? 0 : 1);
     } else {
       error = 1;
     }
@@ -122,25 +122,36 @@ void s21_align_exponents(s21_another_decimal *a, s21_another_decimal *b) {
 }
 
 int s21_multiply_by_10_power(s21_another_decimal *value, int power) {
-  for (int i = 0; i < power; i++) {
-    s21_another_decimal temp = *value;
-    s21_another_decimal temp2 = *value;
-    s21_shift_left(&temp, 3);
-    s21_shift_left(&temp2, 1);
-    return s21_add(temp, temp2, value);
-  }
-  return 0;
+    int error = 0;
+    
+    if (power < 0) {
+        error = 1;
+    } else if (power == 0) {
+        error = 0; 
+    } else {
+        for (int i = 0; i < power && error == 0; i++) {
+            s21_another_decimal temp = *value;
+            s21_another_decimal temp2 = *value;
+            s21_shift_left(&temp, 3);  
+            s21_shift_left(&temp2, 1);
+            error = s21_add(temp, temp2, value);
+        }
+    }
+    
+    return error;
 }
 
-int s21_div_by_10(s21_another_decimal *value, s21_another_decimal *result) {
-   unsigned long long remainder = 0;
-  for (int i = 2; i >= 0; i--) {
-     unsigned long long current = (( unsigned long long)remainder << 32) | value->bits[i];
-    result->bits[i] = (unsigned int)(current / 10);
-    remainder = current % 10;
-  }
-
-  return (remainder == 0) ? 0 : 1;
+int divide_by_10(s21_another_decimal *v) {
+    if (v == NULL) {
+        return -1;
+    }
+    unsigned long long remainder = 0ULL;
+    for (int i = 2; i >= 0; i--) {
+        unsigned long long temp = (remainder << 32) | v->bits[i];
+        v->bits[i] = (unsigned)(temp / 10ULL);
+        remainder = temp % 10; 
+    }
+    return (int)remainder;
 }
 
 int s21_compare_absolute(s21_another_decimal a, s21_another_decimal b) {
@@ -165,16 +176,27 @@ void s21_set_exponent(s21_another_decimal *src, unsigned int exp) {
   src->bits[3] = (exp << 16) | (src->bits[3] & SIGNBIT);
 }
 
-void s21_shift_left(s21_another_decimal *value, int shift) {
-  for (int s = 0; s < shift; s++) {
-    unsigned int carry_prev = 0;
-    for (int i = 0; i < 3; i++) {
-      unsigned int current = value->bits[i];
-      value->bits[i] = (current << 1) | carry_prev;
-      carry_prev = (current >> 31) & 1;
+int s21_shift_left(s21_another_decimal *value, int shift) {
+    if (!value || shift < 0) return 1;
+    if (shift == 0) return 0;
+    
+    int error = 0;
+    unsigned int final_carry = 0;
+    
+    for (int s = 0; s < shift && !error; s++) {
+        unsigned int carry_prev = 0;
+        
+        for (int i = 0; i < 3; i++) {
+            unsigned int current = value->bits[i];
+            value->bits[i] = (current << 1) | carry_prev;
+            carry_prev = (current >> 31) & 1;
+        }
+        
+        if (carry_prev != 0) {
+            final_carry = carry_prev;
+            error = 1;
+        }
     }
-    if (carry_prev != 0) {
-      break;
-    }
-  }
+    
+    return error;
 }
