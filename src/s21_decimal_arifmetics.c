@@ -184,15 +184,13 @@ int s21_compare_absolute(s21_another_decimal a, s21_another_decimal b) {
   return 0;
 }
 
-unsigned int s21_get_exponent(s21_another_decimal src) {
-  src.bits[3] &= ~SIGNBIT;
-  return src.bits[3] >> 16;
+int s21_get_exponent(s21_another_decimal src) {
+    return src.exp; // Просто читаем битовое поле!
 }
 
 void s21_set_exponent(s21_another_decimal *src, unsigned int exp) {
-  if (!src || exp > 28)
-    return;
-  src->bits[3] = (exp << 16) | (src->bits[3] & SIGNBIT);
+    if (!src || exp > 28) return;
+    src->exp = exp; // Просто устанавливаем битовое поле!
 }
 
 int s21_shift_left(s21_another_decimal *value, int shift) {
