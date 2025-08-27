@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 
 #define SIGNBIT 0x80000000 
 
@@ -18,3 +19,5 @@ void s21_set_exponent(s21_decimal *src, unsigned int exponent);
 int s21_from_decimal_to_float(s21_decimal src, float *dst);
 int s21_from_float_to_decimal(float src, s21_decimal *dst);
 int s21_from_decimal_to_int(s21_decimal src, int *dst);
+int s21_truncate(s21_decimal value, s21_decimal *result);
+int s21_divide_by_10(s21_decimal *value);

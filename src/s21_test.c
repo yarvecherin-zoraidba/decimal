@@ -145,11 +145,16 @@ START_TEST(test_s21_decimal_to_float) {
     s21_decimal src6 = {{1234567, 0, 0, (7<<16)}};
     s21_from_decimal_to_float(src6, &number6);
     ck_assert_float_eq(number6, 0.1234567);
-
+  
     float number7 = 0.0;
     s21_decimal src7 = {{4294967295, 4294967295, 0, 0}};
     s21_from_decimal_to_float(src7, &number7);
     ck_assert_float_eq(number7, 0xFFFFFFFFFFFFFFFF);
+
+    float number8 = 0.0;
+    s21_decimal src8 = {{1234567, 0, 0, (28<<16)}};
+    s21_from_decimal_to_float(src8, &number8);
+    ck_assert_int_eq(number8, 0);
 
   }
   END_TEST
@@ -170,7 +175,7 @@ START_TEST(test_s21_decimal_to_float) {
 
     s21_decimal src2;
     ck_assert_int_eq(s21_from_float_to_decimal(NAN, &src2), 1);
-    ck_assert_int_eq(s21_from_float_to_decimal(INFINITY, &src2), 1);
+    ck_assert_int_eq(s21_from_float_to_decimal(1.0 / 0.0, &src2), 1);
     ck_assert_int_eq(s21_from_float_to_decimal(-INFINITY, &src2), 1);
 
     s21_decimal src3;
