@@ -17,1049 +17,899 @@ int main() {
 }
 
 START_TEST(s21_add_1) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 0;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    // 0 + 0 = 0
+    value_1.bits[0] = 0;
+    value_1.bits[1] = 0;
+    value_1.bits[2] = 0;
+    value_1.sign = 0;
+    value_1.exp = 0;
 
-  value_2.bits[0] = 0;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 0;
+    value_2.bits[1] = 0;
+    value_2.bits[2] = 0;
+    value_2.sign = 0;
+    value_2.exp = 0;
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_add(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 0; // Float
-  *(v2_byte + 15) = 0; // Sign
+    exp_result.bits[0] = 0;
+    exp_result.bits[1] = 0;
+    exp_result.bits[2] = 0;
+    exp_result.sign = 0;
+    exp_result.exp = 0;
 
-  s21_add(value_1, value_2, &result);
-
-  exp_result.bits[0] = 0;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 0;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_add_2) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 2;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    // 2 + 2 = 4
+    value_1.bits[0] = 2;
+    value_1.bits[1] = 0;
+    value_1.bits[2] = 0;
+    value_1.sign = 0;
+    value_1.exp = 0;
 
-  value_2.bits[0] = 2;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 2;
+    value_2.bits[1] = 0;
+    value_2.bits[2] = 0;
+    value_2.sign = 0;
+    value_2.exp = 0;
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_add(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 0; // Float
-  *(v2_byte + 15) = 0; // Sign
+    exp_result.bits[0] = 4;
+    exp_result.bits[1] = 0;
+    exp_result.bits[2] = 0;
+    exp_result.sign = 0;
+    exp_result.exp = 0;
 
-  s21_add(value_1, value_2, &result);
-
-  exp_result.bits[0] = 4;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 0;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_add_3) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 0;
-  value_1.bits[1] = 2;
-  value_1.bits[2] = 0;
+    // 0x200000000 + 0x200000000 = 0x400000000
+    value_1.bits[0] = 0;
+    value_1.bits[1] = 2;  // 2 * 2^32
+    value_1.bits[2] = 0;
+    value_1.sign = 0;
+    value_1.exp = 0;
 
-  value_2.bits[0] = 0;
-  value_2.bits[1] = 2;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 0;
+    value_2.bits[1] = 2;  // 2 * 2^32
+    value_2.bits[2] = 0;
+    value_2.sign = 0;
+    value_2.exp = 0;
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_add(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 0; // Float
-  *(v2_byte + 15) = 0; // Sign
+    exp_result.bits[0] = 0;
+    exp_result.bits[1] = 4;  // 4 * 2^32
+    exp_result.bits[2] = 0;
+    exp_result.sign = 0;
+    exp_result.exp = 0;
 
-  s21_add(value_1, value_2, &result);
-
-  exp_result.bits[0] = 0;
-  exp_result.bits[1] = 4;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 0;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_add_4) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 0;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 2;
+    // 0x20000000000000000 + 0x20000000000000000 = 0x40000000000000000
+    value_1.bits[0] = 0;
+    value_1.bits[1] = 0;
+    value_1.bits[2] = 2;  // 2 * 2^64
+    value_1.sign = 0;
+    value_1.exp = 0;
 
-  value_2.bits[0] = 0;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 2;
+    value_2.bits[0] = 0;
+    value_2.bits[1] = 0;
+    value_2.bits[2] = 2;  // 2 * 2^64
+    value_2.sign = 0;
+    value_2.exp = 0;
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_add(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 0; // Float
-  *(v2_byte + 15) = 0; // Sign
+    exp_result.bits[0] = 0;
+    exp_result.bits[1] = 0;
+    exp_result.bits[2] = 4;  // 4 * 2^64
+    exp_result.sign = 0;
+    exp_result.exp = 0;
 
-  s21_add(value_1, value_2, &result);
-
-  exp_result.bits[0] = 0;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 4;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 0;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_add_5) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 10;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    // Устанавливаем значения
+    value_1.bits[0] = 10;
+    value_1.bits[1] = 0;
+    value_1.bits[2] = 0;
+    value_1.sign = 0;    // положительное
+    value_1.exp = 0;     // экспонента = 0
 
-  value_2.bits[0] = 5;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 5;
+    value_2.bits[1] = 0;
+    value_2.bits[2] = 0;
+    value_2.sign = 1;    // отрицательное
+    value_2.exp = 0;     // экспонента = 0
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_add(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 0; // Float
-  *(v2_byte + 15) = 1; // Sign
+    // Ожидаемый результат: 10 + (-5) = 5
+    exp_result.bits[0] = 5;
+    exp_result.bits[1] = 0;
+    exp_result.bits[2] = 0;
+    exp_result.sign = 0; // положительное
+    exp_result.exp = 0;  // экспонента = 0
 
-  s21_add(value_1, value_2, &result);
-
-  exp_result.bits[0] = 5;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 0;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    // Проверяем все поля
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_add_6) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 5;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    // 5 + (-10) = -5
+    value_1.bits[0] = 5;
+    value_1.bits[1] = 0;
+    value_1.bits[2] = 0;
+    value_1.sign = 0;
+    value_1.exp = 0;
 
-  value_2.bits[0] = 10;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 10;
+    value_2.bits[1] = 0;
+    value_2.bits[2] = 0;
+    value_2.sign = 1;
+    value_2.exp = 0;
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_add(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 0; // Float
-  *(v2_byte + 15) = 1; // Sign
+    exp_result.bits[0] = 5;
+    exp_result.bits[1] = 0;
+    exp_result.bits[2] = 0;
+    exp_result.sign = 1;
+    exp_result.exp = 0;
 
-  s21_add(value_1, value_2, &result);
-
-  exp_result.bits[0] = 5;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 1;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_add_7) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 5;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    // (-5) + 10 = 5
+    value_1.bits[0] = 5;
+    value_1.bits[1] = 0;
+    value_1.bits[2] = 0;
+    value_1.sign = 1;
+    value_1.exp = 0;
 
-  value_2.bits[0] = 10;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 10;
+    value_2.bits[1] = 0;
+    value_2.bits[2] = 0;
+    value_2.sign = 0;
+    value_2.exp = 0;
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 1; // Sign
+    s21_add(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 0; // Float
-  *(v2_byte + 15) = 0; // Sign
+    exp_result.bits[0] = 5;
+    exp_result.bits[1] = 0;
+    exp_result.bits[2] = 0;
+    exp_result.sign = 0;
+    exp_result.exp = 0;
 
-  s21_add(value_1, value_2, &result);
-
-  exp_result.bits[0] = 5;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 0;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_add_8) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 10;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    // (-10) + 5 = -5
+    value_1.bits[0] = 10;
+    value_1.bits[1] = 0;
+    value_1.bits[2] = 0;
+    value_1.sign = 1;
+    value_1.exp = 0;
 
-  value_2.bits[0] = 5;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 5;
+    value_2.bits[1] = 0;
+    value_2.bits[2] = 0;
+    value_2.sign = 0;
+    value_2.exp = 0;
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 1; // Sign
+    s21_add(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 0; // Float
-  *(v2_byte + 15) = 0; // Sign
+    exp_result.bits[0] = 5;
+    exp_result.bits[1] = 0;
+    exp_result.bits[2] = 0;
+    exp_result.sign = 1;
+    exp_result.exp = 0;
 
-  s21_add(value_1, value_2, &result);
-
-  exp_result.bits[0] = 5;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 1;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_add_9) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 100;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    // 1.00 + 0.55 = 1.55 (exp=2)
+    value_1.bits[0] = 100;
+    value_1.bits[1] = 0;
+    value_1.bits[2] = 0;
+    value_1.sign = 0;
+    value_1.exp = 2;
 
-  value_2.bits[0] = 55;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 55;
+    value_2.bits[1] = 0;
+    value_2.bits[2] = 0;
+    value_2.sign = 0;
+    value_2.exp = 2;
 
-  *(v1_byte + 14) = 2; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_add(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 2; // Float
-  *(v2_byte + 15) = 0; // Sign
+    exp_result.bits[0] = 155;
+    exp_result.bits[1] = 0;
+    exp_result.bits[2] = 0;
+    exp_result.sign = 0;
+    exp_result.exp = 2;
 
-  s21_add(value_1, value_2, &result);
-
-  exp_result.bits[0] = 155;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 2;
-  *(exp_res_byte + 15) = 0;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_add_10) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 10000;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    // 100.00 + 0.0055 = 100.0055 (exp=4)
+    value_1.bits[0] = 10000;
+    value_1.bits[1] = 0;
+    value_1.bits[2] = 0;
+    value_1.sign = 0;
+    value_1.exp = 2;
 
-  value_2.bits[0] = 55;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 55;
+    value_2.bits[1] = 0;
+    value_2.bits[2] = 0;
+    value_2.sign = 0;
+    value_2.exp = 4;
 
-  *(v1_byte + 14) = 2; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_add(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 4; // Float
-  *(v2_byte + 15) = 0; // Sign
+    exp_result.bits[0] = 1000055;
+    exp_result.bits[1] = 0;
+    exp_result.bits[2] = 0;
+    exp_result.sign = 0;
+    exp_result.exp = 4;
 
-  s21_add(value_1, value_2, &result);
-
-  exp_result.bits[0] = 1000055;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 4;
-  *(exp_res_byte + 15) = 0;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_add_11) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 10000;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    // 100.00 + (-0.0055) = 99.9945 (exp=4)
+    value_1.bits[0] = 10000;
+    value_1.bits[1] = 0;
+    value_1.bits[2] = 0;
+    value_1.sign = 0;
+    value_1.exp = 2;
 
-  value_2.bits[0] = 55;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 55;
+    value_2.bits[1] = 0;
+    value_2.bits[2] = 0;
+    value_2.sign = 1;
+    value_2.exp = 4;
 
-  *(v1_byte + 14) = 2; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_add(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 4; // Float
-  *(v2_byte + 15) = 1; // Sign
+    exp_result.bits[0] = 999945;
+    exp_result.bits[1] = 0;
+    exp_result.bits[2] = 0;
+    exp_result.sign = 0;
+    exp_result.exp = 4;
 
-  s21_add(value_1, value_2, &result);
-
-  exp_result.bits[0] = 999945;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 4;
-  *(exp_res_byte + 15) = 0;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_add_12) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  int error = 0;
-  int exp_error = 0;
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    int error = 0;
+    int exp_error = 1;
 
-  value_1.bits[0] = 0xffffffff;
-  value_1.bits[1] = 0xffffffff;
-  value_1.bits[2] = 0xffffffff;
+    // Переполнение: MAX + 1
+    value_1.bits[0] = 0xffffffff;
+    value_1.bits[1] = 0xffffffff;
+    value_1.bits[2] = 0xffffffff;
+    value_1.sign = 0;
+    value_1.exp = 0;
 
-  value_2.bits[0] = 1;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 1;
+    value_2.bits[1] = 0;
+    value_2.bits[2] = 0;
+    value_2.sign = 0;
+    value_2.exp = 0;
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 0; // Sign
+    error = s21_add(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 0; // Float
-  *(v2_byte + 15) = 0; // Sign
-
-  error = s21_add(value_1, value_2, &result);
-  exp_error = 1;
-
-  ck_assert_int_eq(error, exp_error);
+    ck_assert_int_eq(error, exp_error);
 }
 END_TEST
 
 START_TEST(s21_add_13) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 0xffffffff;
-  value_1.bits[1] = 0xffffffff;
-  value_1.bits[2] = 0xffffffff;
+    // MAX - 0.16 = MAX - 1 (с округлением)
+    value_1.bits[0] = 0xffffffff;
+    value_1.bits[1] = 0xffffffff;
+    value_1.bits[2] = 0xffffffff;
+    value_1.sign = 0;
+    value_1.exp = 0;
 
-  value_2.bits[0] = 16;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 16;
+    value_2.bits[1] = 0;
+    value_2.bits[2] = 0;
+    value_2.sign = 1;
+    value_2.exp = 1;
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_add(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 1; // Float
-  *(v2_byte + 15) = 1; // Sign
+    exp_result.bits[0] = 0xfffffffd;
+    exp_result.bits[1] = 0xffffffff;
+    exp_result.bits[2] = 0xffffffff;
+    exp_result.sign = 0;
+    exp_result.exp = 0;
 
-  s21_add(value_1, value_2, &result);
-
-  exp_result.bits[0] = 0xfffffffd;
-  exp_result.bits[1] = 0xffffffff;
-  exp_result.bits[2] = 0xffffffff;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 0;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_add_14) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 0;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    // 0.00000 + (-0.00) = 0
+    value_1.bits[0] = 0;
+    value_1.bits[1] = 0;
+    value_1.bits[2] = 0;
+    value_1.sign = 0;
+    value_1.exp = 5;
 
-  value_2.bits[0] = 0;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 0;
+    value_2.bits[1] = 0;
+    value_2.bits[2] = 0;
+    value_2.sign = 1;
+    value_2.exp = 2;
 
-  *(v1_byte + 14) = 5; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_add(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 2; // Float
-  *(v2_byte + 15) = 1; // Sign
+    exp_result.bits[0] = 0;
+    exp_result.bits[1] = 0;
+    exp_result.bits[2] = 0;
+    exp_result.sign = 0;
+    exp_result.exp = 0;
 
-  s21_add(value_1, value_2, &result);
-
-  exp_result.bits[0] = 0;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 0;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_sub_1) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
-  value_1.bits[0] = 0;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_2.bits[0] = 0;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    // 0 - 0 = 0
+    value_1.bits[0] = 0;
+    value_1.sign = 0;
+    value_1.exp = 0;
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 0; // Sign
+    value_2.bits[0] = 0;
+    value_2.sign = 0;
+    value_2.exp = 0;
 
-  *(v2_byte + 14) = 0; // Float
-  *(v2_byte + 15) = 0; // Sign
+    s21_sub(value_1, value_2, &result);
 
-  s21_sub(value_1, value_2, &result);
+    exp_result.bits[0] = 0;
+    exp_result.sign = 0;
+    exp_result.exp = 0;
 
-  exp_result.bits[0] = 0;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 0;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_sub_2) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 1;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    // 1 - 2 = -1
+    value_1.bits[0] = 1;
+    value_1.sign = 0;
+    value_1.exp = 0;
 
-  value_2.bits[0] = 2;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 2;
+    value_2.sign = 0;
+    value_2.exp = 0;
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_sub(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 0; // Float
-  *(v2_byte + 15) = 0; // Sign
+    exp_result.bits[0] = 1;
+    exp_result.sign = 1;
+    exp_result.exp = 0;
 
-  s21_sub(value_1, value_2, &result);
-
-  exp_result.bits[0] = 1;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 1;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_sub_3) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 0;
-  value_1.bits[1] = 1;
-  value_1.bits[2] = 0;
+    // 2^32 - 2*2^32 = -2^32
+    value_1.bits[0] = 0;
+    value_1.bits[1] = 1;
+    value_1.sign = 0;
+    value_1.exp = 0;
 
-  value_2.bits[0] = 0;
-  value_2.bits[1] = 2;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 0;
+    value_2.bits[1] = 2;
+    value_2.sign = 0;
+    value_2.exp = 0;
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_sub(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 0; // Float
-  *(v2_byte + 15) = 0; // Sign
+    exp_result.bits[0] = 0;
+    exp_result.bits[1] = 1;
+    exp_result.sign = 1;
+    exp_result.exp = 0;
 
-  s21_sub(value_1, value_2, &result);
-
-  exp_result.bits[0] = 0;
-  exp_result.bits[1] = 1;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 1;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_sub_4) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 0;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 1;
+    // 2^64 - 2*2^64 = -2^64
+    value_1.bits[0] = 0;
+    value_1.bits[1] = 0;
+    value_1.bits[2] = 1;
+    value_1.sign = 0;
+    value_1.exp = 0;
 
-  value_2.bits[0] = 0;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 2;
+    value_2.bits[0] = 0;
+    value_2.bits[1] = 0;
+    value_2.bits[2] = 2;
+    value_2.sign = 0;
+    value_2.exp = 0;
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_sub(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 0; // Float
-  *(v2_byte + 15) = 0; // Sign
+    exp_result.bits[0] = 0;
+    exp_result.bits[1] = 0;
+    exp_result.bits[2] = 1;
+    exp_result.sign = 1;
+    exp_result.exp = 0;
 
-  s21_sub(value_1, value_2, &result);
-
-  exp_result.bits[0] = 0;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 1;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 1;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_sub_5) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 10;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    // 10 - 5 = 5
+    value_1.bits[0] = 10;
+    value_1.sign = 0;
+    value_1.exp = 0;
 
-  value_2.bits[0] = 5;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 5;
+    value_2.sign = 0;
+    value_2.exp = 0;
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_sub(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 0; // Float
-  *(v2_byte + 15) = 0; // Sign
+    exp_result.bits[0] = 5;
+    exp_result.sign = 0;
+    exp_result.exp = 0;
 
-  s21_sub(value_1, value_2, &result);
-
-  exp_result.bits[0] = 5;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 0;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_sub_6) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 5;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    // 5 - 10 = -5
+    value_1.bits[0] = 5;
+    value_1.sign = 0;
+    value_1.exp = 0;
 
-  value_2.bits[0] = 10;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 10;
+    value_2.sign = 0;
+    value_2.exp = 0;
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_sub(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 0; // Float
-  *(v2_byte + 15) = 0; // Sign
+    exp_result.bits[0] = 5;
+    exp_result.sign = 1;
+    exp_result.exp = 0;
 
-  s21_sub(value_1, value_2, &result);
-
-  exp_result.bits[0] = 5;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 1;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_sub_7) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 5;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    // -5 - (-10) = 5
+    value_1.bits[0] = 5;
+    value_1.sign = 1;
+    value_1.exp = 0;
 
-  value_2.bits[0] = 10;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 10;
+    value_2.sign = 1;
+    value_2.exp = 0;
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 1; // Sign
+    s21_sub(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 0; // Float
-  *(v2_byte + 15) = 1; // Sign
+    exp_result.bits[0] = 5;
+    exp_result.sign = 0;
+    exp_result.exp = 0;
 
-  s21_sub(value_1, value_2, &result);
-
-  exp_result.bits[0] = 5;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 0;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_sub_8) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 10;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    // -10 - (-5) = -5
+    value_1.bits[0] = 10;
+    value_1.sign = 1;
+    value_1.exp = 0;
 
-  value_2.bits[0] = 5;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 5;
+    value_2.sign = 1;
+    value_2.exp = 0;
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 1; // Sign
+    s21_sub(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 0; // Float
-  *(v2_byte + 15) = 1; // Sign
+    exp_result.bits[0] = 5;
+    exp_result.sign = 1;
+    exp_result.exp = 0;
 
-  s21_sub(value_1, value_2, &result);
-
-  exp_result.bits[0] = 5;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 1;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_sub_9) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 100;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    // 1.00 - 0.55 = 0.45
+    value_1.bits[0] = 100;
+    value_1.sign = 0;
+    value_1.exp = 2;
 
-  value_2.bits[0] = 55;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 55;
+    value_2.sign = 0;
+    value_2.exp = 2;
 
-  *(v1_byte + 14) = 2; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_sub(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 2; // Float
-  *(v2_byte + 15) = 0; // Sign
+    exp_result.bits[0] = 45;
+    exp_result.sign = 0;
+    exp_result.exp = 2;
 
-  s21_sub(value_1, value_2, &result);
-
-  exp_result.bits[0] = 45;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 2;
-  *(exp_res_byte + 15) = 0;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_sub_10) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 10000;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    // 100.00 - 0.0055 = 99.9945
+    value_1.bits[0] = 10000;
+    value_1.sign = 0;
+    value_1.exp = 2;
 
-  value_2.bits[0] = 55;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 55;
+    value_2.sign = 0;
+    value_2.exp = 4;
 
-  *(v1_byte + 14) = 2; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_sub(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 4; // Float
-  *(v2_byte + 15) = 0; // Sign
+    exp_result.bits[0] = 999945;
+    exp_result.sign = 0;
+    exp_result.exp = 4;
 
-  s21_sub(value_1, value_2, &result);
-
-  exp_result.bits[0] = 999945;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 4;
-  *(exp_res_byte + 15) = 0;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_sub_11) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 10000;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    // 100.00 - (-0.0055) = 100.0055
+    value_1.bits[0] = 10000;
+    value_1.sign = 0;
+    value_1.exp = 2;
 
-  value_2.bits[0] = 55;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 55;
+    value_2.sign = 1;
+    value_2.exp = 4;
 
-  *(v1_byte + 14) = 2; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_sub(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 4; // Float
-  *(v2_byte + 15) = 1; // Sign
+    exp_result.bits[0] = 1000055;
+    exp_result.sign = 0;
+    exp_result.exp = 4;
 
-  s21_sub(value_1, value_2, &result);
-
-  exp_result.bits[0] = 1000055;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 4;
-  *(exp_res_byte + 15) = 0;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_sub_12) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  int error = 0;
-  int exp_error = 0;
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    int error = 0;
+    int exp_error = 2;
 
-  value_1.bits[0] = 0xffffffff;
-  value_1.bits[1] = 0xffffffff;
-  value_1.bits[2] = 0xffffffff;
+    // MAX_DECIMAL - 1 = overflow (negative minus positive)
+    value_1.bits[0] = 0xffffffff;
+    value_1.bits[1] = 0xffffffff;
+    value_1.bits[2] = 0xffffffff;
+    value_1.sign = 1;
+    value_1.exp = 0;
 
-  value_2.bits[0] = 1;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 1;
+    value_2.sign = 0;
+    value_2.exp = 0;
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 1; // Sign
+    error = s21_sub(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 0; // Float
-  *(v2_byte + 15) = 0; // Sign
-
-  error = s21_sub(value_1, value_2, &result);
-  exp_error = 2;
-
-  ck_assert_int_eq(error, exp_error);
+    ck_assert_int_eq(error, exp_error);
 }
 END_TEST
 
 START_TEST(s21_sub_13) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 0xffffffff;
-  value_1.bits[1] = 0xffffffff;
-  value_1.bits[2] = 0xffffffff;
+    // MAX_DECIMAL - 0.16 = MAX_DECIMAL - 16 (after normalization)
+    value_1.bits[0] = 0xffffffff;
+    value_1.bits[1] = 0xffffffff;
+    value_1.bits[2] = 0xffffffff;
+    value_1.sign = 0;
+    value_1.exp = 0;
 
-  value_2.bits[0] = 16;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 16;
+    value_2.sign = 0;
+    value_2.exp = 1;
 
-  *(v1_byte + 14) = 0; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_sub(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 1; // Float
-  *(v2_byte + 15) = 0; // Sign
+    exp_result.bits[0] = 0xfffffffd;
+    exp_result.bits[1] = 0xffffffff;
+    exp_result.bits[2] = 0xffffffff;
+    exp_result.sign = 0;
+    exp_result.exp = 0;
 
-  s21_sub(value_1, value_2, &result);
-
-  exp_result.bits[0] = 0xfffffffd;
-  exp_result.bits[1] = 0xffffffff;
-  exp_result.bits[2] = 0xffffffff;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 0;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
 START_TEST(s21_sub_14) {
-  s21_decimal value_1 = s21_decimal_init();
-  s21_decimal value_2 = s21_decimal_init();
-  s21_decimal result;
-  s21_decimal exp_result = s21_decimal_init();
-  char *v1_byte = (char *)value_1.bits;
-  char *v2_byte = (char *)value_2.bits;
-  char *exp_res_byte = (char *)exp_result.bits;
+    s21_another_decimal value_1 = {0};
+    s21_another_decimal value_2 = {0};
+    s21_another_decimal result = {0};
+    s21_another_decimal exp_result = {0};
 
-  value_1.bits[0] = 0;
-  value_1.bits[1] = 0;
-  value_1.bits[2] = 0;
+    // 0.00000 - (-0.00) = 0
+    value_1.bits[0] = 0;
+    value_1.sign = 0;
+    value_1.exp = 5;
 
-  value_2.bits[0] = 0;
-  value_2.bits[1] = 0;
-  value_2.bits[2] = 0;
+    value_2.bits[0] = 0;
+    value_2.sign = 1;
+    value_2.exp = 2;
 
-  *(v1_byte + 14) = 5; // Float
-  *(v1_byte + 15) = 0; // Sign
+    s21_sub(value_1, value_2, &result);
 
-  *(v2_byte + 14) = 2; // Float
-  *(v2_byte + 15) = 1; // Sign
+    exp_result.bits[0] = 0;
+    exp_result.sign = 0;
+    exp_result.exp = 0;
 
-  s21_sub(value_1, value_2, &result);
-
-  exp_result.bits[0] = 0;
-  exp_result.bits[1] = 0;
-  exp_result.bits[2] = 0;
-
-  *(exp_res_byte + 14) = 0;
-  *(exp_res_byte + 15) = 0;
-
-  for (int i = 0; i < 4; i++) {
-    ck_assert_int_eq(result.bits[i], exp_result.bits[i]);
-  }
+    ck_assert_int_eq(result.bits[0], exp_result.bits[0]);
+    ck_assert_int_eq(result.bits[1], exp_result.bits[1]);
+    ck_assert_int_eq(result.bits[2], exp_result.bits[2]);
+    ck_assert_int_eq(result.sign, exp_result.sign);
+    ck_assert_int_eq(result.exp, exp_result.exp);
 }
 END_TEST
 
