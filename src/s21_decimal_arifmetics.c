@@ -57,56 +57,59 @@ int s21_add(s21_another_decimal value1, s21_another_decimal value2, s21_another_
 
 int s21_sub(s21_another_decimal value1, s21_another_decimal value2, s21_another_decimal *result) {
     *result = s21_decimal_init();
-    int error = 0;
     
-    // Обрабатываем разные знаки - преобразуем в сложение
-    if (value1.sign != value2.sign) {
-        value2.sign = !value2.sign; // Меняем знак второго числа
-        return s21_add(value1, value2, result);
-    }
-
-    // Выравниваем экспоненты
-    s21_another_decimal aligned1 = value1;
-    s21_another_decimal aligned2 = value2;
-    
-    error = s21_align_exponents(&aligned1, &aligned2);
-    if (error) return error;
-    
-    int exp = s21_get_exponent(aligned1);
-    int comparison = s21_compare_absolute(aligned1, aligned2);
-    
-    if (comparison == 0) {
-        *result = s21_decimal_init(); // Результат 0
+    // Специальная обработка для нулей
+    if (s21_is_zero(value1) && s21_is_zero(value2)) {
+        *result = s21_decimal_init();
         return 0;
     }
     
-    // Определяем большее и меньшее число (используем копии, а не указатели)
-    s21_another_decimal larger, smaller;
-    int result_sign = 0;
+    // Если знаки разные - преобразуем в сложение
+    if (value1.sign != value2.sign) {
+        value2.sign = !value2.sign;
+        return s21_add(value1, value2, result);
+    }
     
-    if (comparison > 0) {
-        larger = aligned1;
-        smaller = aligned2;
-        result_sign = value1.sign;
+    // Выравниваем экспоненты
+    s21_another_decimal a = value1;
+    s21_another_decimal b = value2;
+    int error = s21_align_exponents(&a, &b);
+    if (error) return error;
+    
+    int exp = a.exp;
+    int cmp = s21_compare_absolute(a, b);
+    
+    if (cmp == 0) {
+        *result = s21_decimal_init();
+        return 0;
+    }
+    
+    // Определяем какое число больше по модулю
+    s21_another_decimal *bigger, *smaller;
+    int result_sign;
+    
+    if (cmp > 0) {
+        bigger = &a;
+        smaller = &b;
+        result_sign = a.sign;
     } else {
-        larger = aligned2;
-        smaller = aligned1;
-        result_sign = !value1.sign;
+        bigger = &b;
+        smaller = &a;
+        result_sign = !a.sign;
     }
     
     // Вычитание с заимствованием
-    unsigned int borrow = 0;
-    
+    unsigned long long borrow = 0;
     for (int i = 0; i < 3; i++) {
-        unsigned long long larger_val = (unsigned long long)larger.bits[i];
-        unsigned long long smaller_val = (unsigned long long)smaller.bits[i] + borrow;
+        unsigned long long big_val = bigger->bits[i];
+        unsigned long long small_val = smaller->bits[i] + borrow;
         
-        if (larger_val < smaller_val) {
-            result->bits[i] = (unsigned int)(0x100000000ULL + larger_val - smaller_val);
-            borrow = 1;
-        } else {
-            result->bits[i] = (unsigned int)(larger_val - smaller_val);
+        if (big_val >= small_val) {
+            result->bits[i] = big_val - small_val;
             borrow = 0;
+        } else {
+            result->bits[i] = (1ULL << 32) + big_val - small_val;
+            borrow = 1;
         }
     }
     
@@ -115,36 +118,36 @@ int s21_sub(s21_another_decimal value1, s21_another_decimal value2, s21_another_
         return 2; // Код ошибки для переполнения
     }
     
-    // Устанавливаем экспоненту и знак
-    s21_set_exponent(result, exp);
+    result->exp = exp;
     result->sign = result_sign;
     
-    return error;
+    return 0;
 }
 
 int s21_align_exponents(s21_another_decimal *a, s21_another_decimal *b) {
     if (!a || !b) return 1;
     
-    int exp1 = s21_get_exponent(*a);
-    int exp2 = s21_get_exponent(*b);
+    int exp1 = a->exp;
+    int exp2 = b->exp;
     
     if (exp1 == exp2) return 0;
     
+    int diff = abs(exp1 - exp2);
     int error = 0;
     
     if (exp1 < exp2) {
-        error = s21_multiply_by_10_power(a, exp2 - exp1);
-        if (!error) {
-            s21_set_exponent(a, exp2);
-        }
+        error = s21_multiply_by_10_power(a, diff);
+        if (!error) a->exp = exp2;
     } else {
-        error = s21_multiply_by_10_power(b, exp1 - exp2);
-        if (!error) {
-            s21_set_exponent(b, exp1);
-        }
+        error = s21_multiply_by_10_power(b, diff);
+        if (!error) b->exp = exp1;
     }
     
     return error;
+}
+
+int s21_is_zero(s21_another_decimal value) {
+    return value.bits[0] == 0 && value.bits[1] == 0 && value.bits[2] == 0;
 }
 
 int s21_multiply_by_10_power(s21_another_decimal *value, int power) {
@@ -187,10 +190,6 @@ int s21_compare_absolute(s21_another_decimal a, s21_another_decimal b) {
         if (a.bits[i] < b.bits[i]) return -1;
     }
     return 0;
-}
-
-int s21_is_zero(s21_another_decimal value) {
-    return value.bits[0] == 0 && value.bits[1] == 0 && value.bits[2] == 0;
 }
 
 int s21_get_exponent(s21_another_decimal src) {
