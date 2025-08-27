@@ -70,7 +70,7 @@ int s21_from_decimal_to_int(s21_decimal src, int *dst) {
     
     int is_min_int = (sign == -1 && values[0] == SIGNBIT && values[1] == 0 && values[2] == 0);
     
-    int overflow = (sign == 1 && values[0] > 0x7FFFFFFF) || (sign == -1 && values[0] > SIGNBIT);
+    int overflow = (sign == 1 && values[0] > MAX_INT) || (sign == -1 && values[0] > SIGNBIT);
 
     if (has_overflow != 0 || overflow != 0) {
         *dst = 0;
