@@ -113,53 +113,48 @@ int s21_from_decimal_to_float(s21_decimal src, float *dst) {
 
 int s21_from_float_to_decimal(float src, s21_decimal *dst) {
     s21_init(dst);
-    int status = 0;
-
-    if (isinf(src) || isnan(src)) {
-        status = 1;
+    
+    if (isinf(src) || isnan(src) || (src > 0 && src < 1e-28) || (src < 0 && src > -1e-28)) {
         s21_init(dst);
-    } else if ((src > 0 && src < 1e-28) || (src < 0 && src > -1e-28)) {
-        status = 1;
-        s21_init(dst);
-    } else {
-        if (src < 0) {
-            dst->bits[3] |= SIGNBIT;
-            src = -src;
-        }
-        unsigned int scale = 0;
-        
-        while (src > 0 && src < 1000000.0 && scale < 28) {
-            src *= 10.0;
-            scale++;
-        }
-        unsigned int float_bits = *(unsigned int *)&src;
-        int float_exponent = ((float_bits >> 23) & 0xFF) - 127;
-        
-        unsigned int mantissa = float_bits & 0x7FFFFF; // 23 бита
-        
-        if (float_exponent >= 0) {
-            mantissa |= 0x800000; 
-        }
-        
-        if (mantissa != 0) {
-            for (int bit_pos = 23; bit_pos >= 0; bit_pos--) {
-                if (mantissa & (1U << bit_pos)) {
-                    int target_pos = float_exponent - (23 - bit_pos);
-                    if (target_pos >= 0 && target_pos < 96) {
-                        int block = target_pos / 32;
-                        int bit = target_pos % 32;
-                        if (block < 3) {
-                            dst->bits[block] |= (1U << bit);
-                        }
+        return 1;
+    }
+    
+    if (src < 0) {
+        dst->bits[3] |= SIGNBIT;
+        src = -src;
+    }
+    
+    unsigned int scale = 0;
+    while (src > 0 && src < 1000000.0 && scale < 28) {
+        src *= 10.0;
+        scale++;
+    }
+    
+    unsigned int float_bits = *(unsigned int *)&src;
+    int float_exponent = ((float_bits >> 23) & 0xFF) - 127;
+    unsigned int mantissa = float_bits & 0x7FFFFF; //0-22
+    
+    if (float_exponent >= 0) {
+        mantissa |= 0x800000;
+    }
+    if (mantissa != 0) {
+        for (int bit_pos = 23; bit_pos >= 0; bit_pos--) {
+            if (mantissa & (1U << bit_pos)) {
+                int target_pos = float_exponent - (23 - bit_pos);
+                if (target_pos >= 0 && target_pos < 96) {
+                    int block = target_pos / 32;
+                    int bit = target_pos % 32;
+                    if (block < 3) {
+                        dst->bits[block] |= (1U << bit);
                     }
                 }
             }
         }
-        
-        dst->bits[3] |= (scale << 16);
     }
     
-    return status;
+    dst->bits[3] |= (scale << 16);
+    
+    return 0;
 }
 
 unsigned int s21_get_exponent(s21_decimal src)
