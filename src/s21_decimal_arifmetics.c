@@ -61,58 +61,93 @@ int s21_add(s21_another_decimal value1, s21_another_decimal value2, s21_another_
 }
 
 int s21_sub(s21_another_decimal value1, s21_another_decimal value2, s21_another_decimal *result) {
-  *result = s21_decimal_init();
-  int error = 0;
-  if (value1.sign ^ value2.sign) {
-    if (value1.sign) {
-      value1.sign = 0;
-      error = s21_add(value1, value2, result);
-      result->sign = 1;
-    } else {
-      value2.sign = 0;
-      error = s21_add(value1, value2, result);
-    }
-    return error;
-  }
-
-  s21_align_exponents(&value1, &value2);
-  int comparison = s21_compare_absolute(value1, value2);
-  if (comparison == 0) {
     *result = s21_decimal_init();
-    return 0;
-  }
-  s21_another_decimal *larger = {0};
-  s21_another_decimal *smaller = {0};
-  int result_sign = 0;
-
-  if (comparison > 0) {
-    larger = &value1;
-    smaller = &value2;
-    result_sign = value1.sign;
-  } else {
-    larger = &value2;
-    smaller = &value1;
-    result_sign = !value1.sign;
-  }
-   unsigned long long borrow = 0;
-
-  for (int i = 0; i < 3; i++) {
-     unsigned long long larger_val = ( unsigned long long)larger->bits[i];
-     unsigned long long smaller_val = ( unsigned long long)smaller->bits[i] + borrow;
-
-    if (larger_val < smaller_val) {
-      result->bits[i] = (unsigned int)((UINT_MAX + 1) + larger_val - smaller_val);
-      borrow = 1;
-    } else {
-      result->bits[i] = (unsigned int)(larger_val - smaller_val);
-      borrow = 0;
+    int error = 0;
+    
+    // Обрабатываем разные знаки - преобразуем в сложение
+    if (value1.sign != value2.sign) {
+        value2.sign = !value2.sign; // Меняем знак второго числа
+        error = s21_add(value1, value2, result);
+        return error;
     }
-  }
 
-  s21_set_exponent(result, s21_get_exponent(value1));
-  result->sign = result_sign;
+    // Выравниваем экспоненты
+    s21_another_decimal aligned1 = value1;
+    s21_another_decimal aligned2 = value2;
+    
+    error = s21_align_exponents(&aligned1, &aligned2);
+    if (error) return error;
+    
+    int exp = s21_get_exponent(aligned1);
+    int comparison = s21_compare_absolute(aligned1, aligned2);
+    
+    if (comparison == 0) {
+        *result = s21_decimal_init(); // Результат 0
+        return 0;
+    }
+    
+    // Определяем большее и меньшее число
+    s21_another_decimal larger, smaller;
+    int result_sign = 0;
+    
+    if (comparison > 0) {
+        larger = aligned1;
+        smaller = aligned2;
+        result_sign = value1.sign;
+    } else {
+        larger = aligned2;
+        smaller = aligned1;
+        result_sign = !value1.sign;
+    }
+    
+    // Вычитание с заимствованием
+    unsigned int borrow = 0;
+    
+    for (int i = 0; i < 3; i++) {
+        unsigned long long larger_val = (unsigned long long)larger.bits[i];
+        unsigned long long smaller_val = (unsigned long long)smaller.bits[i] + borrow;
+        
+        if (larger_val >= smaller_val) {
+            result->bits[i] = (unsigned int)(larger_val - smaller_val);
+            borrow = 0;
+        } else {
+            result->bits[i] = (unsigned int)(0x100000000ULL + larger_val - smaller_val);
+            borrow = 1;
+        }
+    }
+    
+    // Проверка на переполнение (должен быть 0 после всех заимствований)
+    if (borrow != 0) {
+        // Это указывает на серьезную ошибку
+        return 2;
+    }
+    
+    // Устанавливаем экспоненту и знак
+    s21_set_exponent(result, exp);
+    result->sign = result_sign;
+    
+    // Нормализация результата (убираем лишние нули в конце)
+    s21_normalize(result);
+    
+    return error;
+}
 
-  return error;
+void s21_normalize(s21_another_decimal *value) {
+    if (!value || s21_is_zero(*value)) {
+        s21_set_exponent(value, 0);
+        value->sign = 0;
+        return;
+    }
+    
+    // Пытаемся уменьшить экспоненту, деля на 10 пока возможно
+    while (value->exp > 0 && value->bits[0] % 10 == 0) {
+        s21_div_by_10(value, value);
+        value->exp--;
+    }
+}
+
+int s21_is_zero(s21_another_decimal value) {
+    return value.bits[0] == 0 && value.bits[1] == 0 && value.bits[2] == 0;
 }
 
 int s21_align_exponents(s21_another_decimal *a, s21_another_decimal *b) {
