@@ -6,51 +6,63 @@ s21_another_decimal s21_decimal_init() {
 }
 
 int s21_add(s21_another_decimal value1, s21_another_decimal value2, s21_another_decimal *result) {
-  *result = s21_decimal_init();
-  int error = 0;
-  if (value1.sign ^ value2.sign) {
-    if (value1.sign) {
-      value1.sign = 0;
-      error = s21_sub(value2, value1, result);
-    } else {
-      value2.sign = 0;
-      error = s21_sub(value1, value2, result);
+    *result = s21_decimal_init();
+    int error = 0;
+    
+    // Обрабатываем разные знаки - преобразуем в вычитание
+    if (value1.sign ^ value2.sign) {
+        if (value1.sign) {
+            value1.sign = 0;
+            error = s21_sub(value2, value1, result);
+        } else {
+            value2.sign = 0;
+            error = s21_sub(value1, value2, result);
+        }
+        return error; // ВАЖНО: возвращаемся сразу после вычитания
     }
-  }
-  int exp1 = s21_get_exponent(value1);
-  int exp2 = s21_get_exponent(value2);
-
-  int max_exp = (exp1 > exp2) ? exp1 : exp2;
-  s21_another_decimal aligned1 = value1;
-  s21_another_decimal aligned2 = value2;
-
-  s21_align_exponents(&aligned1, &aligned2);
-
-  unsigned long long sum = ( unsigned long long)aligned1.bits[0] + ( unsigned long long)aligned2.bits[0];
-   unsigned long long carry = sum >> 32;
-  result->bits[0] = (unsigned int)sum;
-
-  sum = ( unsigned long long)aligned1.bits[1] + ( unsigned long long)aligned2.bits[1] + carry;
-  carry = sum >> 32;
-  result->bits[1] = (unsigned int)sum;
-
-  sum = ( unsigned long long)aligned1.bits[2] + ( unsigned long long)aligned2.bits[2] + carry;
-  carry = sum >> 32;
-  result->bits[2] = (unsigned int)sum;
-
-  if (carry > 0) {
-    if (max_exp > 0) {
-      s21_another_decimal temp = *result;
-      s21_set_exponent(result, max_exp - 1);
-      error = (s21_div_by_10(&temp, result) ? 0 : 1);
-    } else {
-      error = 1;
+    
+    // Выравниваем экспоненты
+    int exp1 = s21_get_exponent(value1);
+    int exp2 = s21_get_exponent(value2);
+    int max_exp = (exp1 > exp2) ? exp1 : exp2;
+    
+    s21_another_decimal aligned1 = value1;
+    s21_another_decimal aligned2 = value2;
+    s21_align_exponents(&aligned1, &aligned2);
+    
+    // Сложение с учетом переносов
+    unsigned long long sum = 0;
+    unsigned long long carry = 0;
+    
+    for (int i = 0; i < 3; i++) {
+        sum = (unsigned long long)aligned1.bits[i] + 
+              (unsigned long long)aligned2.bits[i] + 
+              carry;
+        carry = sum >> 32;
+        result->bits[i] = (unsigned int)(sum & 0xFFFFFFFF);
     }
-  } else {
-    s21_set_exponent(result, max_exp);
-  }
-  result->sign = value1.sign;
-  return error;
+    
+    // Обрабатываем переполнение
+    if (carry > 0) {
+        if (max_exp > 0) {
+            // Пытаемся уменьшить масштаб
+            s21_another_decimal temp = *result;
+            s21_set_exponent(&temp, max_exp);
+            error = s21_div_by_10(&temp, result);
+            if (!error) {
+                s21_set_exponent(result, max_exp - 1);
+            }
+        } else {
+            error = 1; // Переполнение
+        }
+    } else {
+        s21_set_exponent(result, max_exp);
+    }
+    
+    // Устанавливаем знак (оба числа имеют одинаковый знак)
+    result->sign = value1.sign;
+    
+    return error;
 }
 
 int s21_sub(s21_another_decimal value1, s21_another_decimal value2, s21_another_decimal *result) {
