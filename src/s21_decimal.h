@@ -2,6 +2,7 @@
 #include <math.h>
 
 #define SIGNBIT 0x80000000 
+#define MIN_INT -2147483648
 
 typedef struct {
     unsigned int bits[4]; 

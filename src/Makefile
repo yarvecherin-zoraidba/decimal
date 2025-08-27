@@ -23,12 +23,11 @@ test: s21_test.c s21_decimal.a
 	$(CC) $(CFLAGS) -g s21_test.o s21_decimal.a $(FLAGS_PLATFORM) -o s21_test
 
 gcov_report: s21_decimal.a
-	$(CC) $(CFLAGS) --coverage test.c s21_decimal.c s21_decimal.a $(FLAGS_PLATFORM) -o gcov_test
+	$(CC) $(CFLAGS) --coverage s21_test.c s21_decimal.c s21_decimal.a $(FLAGS_PLATFORM) -o gcov_test
 	chmod +x *
 	./gcov_test
-	lcov -t s21_test -o test.info -c -d .
-	genhtml -o report test.info
-	open ./report/index.html
+	lcov -t s21_test -o s21_test.info -c -d .
+	genhtml -o report s21_test.info
 
 rebuild: clean all
 
