@@ -141,20 +141,20 @@ int s21_align_exponents(s21_another_decimal *a, s21_another_decimal *b) {
 }
 
 int s21_multiply_by_10_power(s21_another_decimal *value, int power) {
+    if (!value || power < 0) return 1;
+    if (power == 0) return 0;
+    
     int error = 0;
     
-    if (power < 0) {
-        error = 1;
-    } else if (power == 0) {
-        error = 0; 
-    } else {
-        for (int i = 0; i < power && error == 0; i++) {
-            s21_another_decimal temp = *value;
-            s21_another_decimal temp2 = *value;
-            s21_shift_left(&temp, 3);  
-            s21_shift_left(&temp2, 1);
-            error = s21_add(temp, temp2, value);
-        }
+    for (int i = 0; i < power && !error; i++) {
+        s21_another_decimal temp = *value;
+        s21_another_decimal temp2 = *value;
+        
+        // Умножение на 10 = умножение на 8 + умножение на 2
+        s21_shift_left(&temp, 3);  // temp = value * 8
+        s21_shift_left(&temp2, 1); // temp2 = value * 2
+        
+        error = s21_add(temp, temp2, value);
     }
     
     return error;
