@@ -58,12 +58,6 @@ int s21_add(s21_another_decimal value1, s21_another_decimal value2, s21_another_
 int s21_sub(s21_another_decimal value1, s21_another_decimal value2, s21_another_decimal *result) {
     *result = s21_decimal_init();
     
-    // Специальная обработка для нулей
-    if (s21_is_zero(value1) && s21_is_zero(value2)) {
-        *result = s21_decimal_init();
-        return 0;
-    }
-    
     // Если знаки разные - преобразуем в сложение
     if (value1.sign != value2.sign) {
         value2.sign = !value2.sign;
@@ -102,18 +96,28 @@ int s21_sub(s21_another_decimal value1, s21_another_decimal value2, s21_another_
     unsigned long long borrow = 0;
     for (int i = 0; i < 3; i++) {
         unsigned long long big_val = bigger->bits[i];
-        unsigned long long small_val = smaller->bits[i] + borrow;
+        unsigned long long small_val = smaller->bits[i];
+        
+        // Учитываем предыдущий заем
+        if (borrow) {
+            if (big_val == 0) {
+                big_val = 0xFFFFFFFFFFFFFFFFULL;
+                borrow = 1;
+            } else {
+                big_val -= 1;
+                borrow = 0;
+            }
+        }
         
         if (big_val >= small_val) {
             result->bits[i] = big_val - small_val;
-            borrow = 0;
         } else {
             result->bits[i] = (1ULL << 32) + big_val - small_val;
             borrow = 1;
         }
     }
     
-    // Проверка на переполнение
+    // Проверка на переполнение (если borrow остался после всех разрядов)
     if (borrow != 0) {
         return 2; // Код ошибки для переполнения
     }
@@ -132,15 +136,15 @@ int s21_align_exponents(s21_another_decimal *a, s21_another_decimal *b) {
     
     if (exp1 == exp2) return 0;
     
-    int diff = abs(exp1 - exp2);
-    int error = 0;
+    // Определяем на сколько нужно умножить
+    int diff = (exp1 < exp2) ? (exp2 - exp1) : (exp1 - exp2);
+    s21_another_decimal *target = (exp1 < exp2) ? a : b;
+    int target_exp = (exp1 < exp2) ? exp2 : exp1;
     
-    if (exp1 < exp2) {
-        error = s21_multiply_by_10_power(a, diff);
-        if (!error) a->exp = exp2;
-    } else {
-        error = s21_multiply_by_10_power(b, diff);
-        if (!error) b->exp = exp1;
+    // Умножаем на 10^diff
+    int error = s21_multiply_by_10_power(target, diff);
+    if (!error) {
+        target->exp = target_exp;
     }
     
     return error;
@@ -151,23 +155,27 @@ int s21_is_zero(s21_another_decimal value) {
 }
 
 int s21_multiply_by_10_power(s21_another_decimal *value, int power) {
-    int error = 0;
+    if (!value || power < 0) return 1;
+    if (power == 0) return 0;
     
-    if (power < 0) {
-        error = 1;
-    } else if (power == 0) {
-        error = 0; 
-    } else {
-        for (int i = 0; i < power && error == 0; i++) {
-            s21_another_decimal temp = *value;
-            s21_another_decimal temp2 = *value;
-            s21_shift_left(&temp, 3);  
-            s21_shift_left(&temp2, 1);
-            error = s21_add(temp, temp2, value);
+    for (int i = 0; i < power; i++) {
+        // Проверяем не вызовет ли умножение на 10 переполнение
+        unsigned long long carry = 0;
+        for (int j = 0; j < 3; j++) {
+            unsigned long long temp = (unsigned long long)value->bits[j] * 10 + carry;
+            if (temp > 0xFFFFFFFFULL) {
+                carry = temp >> 32;
+                value->bits[j] = temp & 0xFFFFFFFFULL;
+            } else {
+                value->bits[j] = temp;
+                carry = 0;
+            }
+        }
+        if (carry > 0) {
+            return 1; // Переполнение
         }
     }
-    
-    return error;
+    return 0;
 }
 
 int s21_div_by_10(s21_another_decimal *value, s21_another_decimal *result) {
