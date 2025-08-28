@@ -1,73 +1,63 @@
 #include "s21_round.h"
-#include  <stdbool.h>
+#include "s21_decimal.h"
 
 int s21_floor(s21_decimal value, s21_decimal *result) {
-  unsigned int scale = s21_get_exp(value);
-
-  if (result == NULL) return 1;
-  if (scale > 28) return 1;
-
   int error = 0;
-  int largest_fractional_part = 0;
 
-
-  *result = value;
-  remove_leading_zeros(result);
-  scale = s21_get_exp(*result);
-  if (s21_get_sign(*result) == 0) {
+  if (result == NULL || s21_get_exp(*result) > 28) error = 1;
+  else {
+    int largest_fractional_part = 0;
+    *result = value;
+    unsigned int scale = s21_get_exp(value);
+    remove_zero_if_div_10(result, scale);
+    scale = s21_get_exp(*result);
     s21_truncate(*result, result);
-  } else {
-    if (scale > 0) {
-      while (scale != 0) {
-        largest_fractional_part = s21_divide_by_10(result);
+    if (s21_get_sign(*result) != 0) {
+      if (scale > 0) {
+        add_digit(result, 1);
         s21_set_exp(result, 0);
-        scale--;
       }
-    add_digit(result, 1);
     }
   }
-  
   return error;
 }
 
-
 int s21_round(s21_decimal value, s21_decimal *result) {
-  unsigned int scale = s21_get_exp(value);
-  if (result == NULL) return 1;
-  if (scale > 28) return 1;
   int error = 0;
-  
-  int largest_fractional_part = 0;
-  *result = value;
+  unsigned int scale = s21_get_exp(value);
 
-  while ((scale--) != 0) {
-    largest_fractional_part = s21_divide_by_10(result);
-  }
-  s21_set_exp(result, 0);
-  if (largest_fractional_part >= 5) add_digit(result, 1);
+  if (result == NULL || s21_get_exp(*result) > 28) error = 1;
+  else {
+    int largest_fractional_part = 0;
+    *result = value;
 
+    while ((scale--) != 0) {
+      largest_fractional_part = divide_by_10(result);
+    }
+      s21_set_exp(result, 0);
+      if (largest_fractional_part >= 5) add_digit(result, 1);
+    }
   return error;
 }
 
 int s21_truncate(s21_decimal value, s21_decimal *result) {
-  if (result == NULL) return 1;
-
+  int error = 0;
   int scale = s21_get_exp(value);
-  if (scale > 28) return 1;
 
-  if (!result) return 1;
+  if (result == NULL || s21_get_exp(*result) > 28) error = 1;  
+  else {
+    *result = value;
 
-  *result = value;
-
-  while ((scale--) != 0) {
-    s21_divide_by_10(result);
+    while ((scale--) != 0) {
+      divide_by_10(result);
+    }
+    s21_set_exp(result, 0);
   }
 
-  s21_set_exp(result, 0);
-  return 0;
+  return error;
 }
 
-int s21_divide_by_10(s21_decimal *value) {
+int divide_by_10(s21_decimal *value) {
   if (value == NULL) return -1;
 
   unsigned long long buff = 0;
@@ -86,16 +76,26 @@ _Bool add_digit(s21_decimal *value, unsigned digit) {
     for (int i = 0; i < 3; i++) {
         overflow += (unsigned long long)value->bits[i];
         value->bits[i] = (unsigned)overflow;
-        overflow = overflow >> 32;
+        overflow = overflow >> UINT_SIZE;
     }
     return (overflow != 0ULL);
 }
 
-void remove_leading_zeros(s21_decimal *value) {
-  int scale = s21_get_exp(*value);
-  while ((scale != 0) && (value->bits[0] % 10 == 0)) {
-    s21_divide_by_10(value);
-    scale--;
-  };
-  s21_set_exp(value, scale);
+int remove_zero_if_div_10(s21_decimal *v, int delta_ex) {
+    int ex_v = -1;
+    if (v != NULL) {
+        ex_v = (int)((v->bits[3] & EXBITS) >> 16);
+        unsigned long long remainder = 0ULL;
+        while (delta_ex-- > 0 && ex_v > 0 && remainder == 0ULL) {
+            s21_decimal v_temp = *v;
+            remainder = (unsigned long long)divide_by_10(&v_temp);
+            if (remainder == 0ULL) {
+                *v = v_temp;
+                ex_v--;
+            }
+        }
+        v->bits[3] &= SIGNBIT;
+        v->bits[3] |= (ex_v << 16);
+    }
+    return ex_v;
 }

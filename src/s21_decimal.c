@@ -1,8 +1,5 @@
 #include "s21_decimal.h"
 #include "s21_round.h"
-#include <assert.h>
-
-#define SIGNBIT 0x80000000
 
 void print_decimal(s21_decimal d) {
     printf("bits[0]: %u\n", d.bits[0]);

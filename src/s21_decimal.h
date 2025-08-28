@@ -2,7 +2,9 @@
 #define S21_DECIMAL_H
 
 #include <stdio.h>
-#include <limits.h>
+#include <stdint.h>
+
+#define SIGNBIT 0x80000000
 
 typedef struct {
     unsigned int bits[4]; 
