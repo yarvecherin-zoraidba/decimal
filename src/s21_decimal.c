@@ -12,14 +12,12 @@ void s21_set_sign(s21_decimal *src, int sign) {
 
 int s21_negate(s21_decimal value, s21_decimal *result) {
   int status = 0;
-
-  if (result) {
+  if (result == NULL || s21_get_exp(value) > 28)
+    status = 1;
+  else {
     *result = value;
     s21_set_sign(result, !s21_get_sign(value));
-  } else {
-    status = 1;
   }
-
   return status;
 }
 
@@ -946,7 +944,7 @@ int s21_mul(s21_decimal a, s21_decimal b, s21_decimal *result) {
 int s21_floor(s21_decimal value, s21_decimal *result) {
   int error = 0;
 
-  if (result == NULL || s21_get_exp(*result) > 28)
+  if (result == NULL || s21_get_exp(value) > 28)
     error = 1;
   else {
     *result = value;
@@ -968,7 +966,7 @@ int s21_round(s21_decimal value, s21_decimal *result) {
   int error = 0;
   unsigned int scale = s21_get_exp(value);
 
-  if (result == NULL || s21_get_exp(*result) > 28)
+  if (result == NULL || s21_get_exp(value) > 28)
     error = 1;
   else {
     int largest_fractional_part = 0;
@@ -987,7 +985,7 @@ int s21_truncate(s21_decimal value, s21_decimal *result) {
   int error = 0;
   int scale = s21_get_exp(value);
 
-  if (result == NULL || s21_get_exp(*result) > 28)
+  if (result == NULL || s21_get_exp(value) > 28)
     error = 1;
   else {
     *result = value;

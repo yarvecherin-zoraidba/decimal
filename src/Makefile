@@ -9,7 +9,7 @@ endif
 
 GCOV_FLAGS = --coverage
 
-PHONY: all clean test s21_decimal.a gcov_report
+.PHONY: all clean test s21_decimal.a gcov_report
 
 all: s21_decimal.a
 
