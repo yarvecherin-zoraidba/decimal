@@ -11,10 +11,20 @@
 #define EXBITS 0x00FF0000U
 #define NOT_VALIDBITS 0x7F00FFFFU
 
+#define LONG_BITS 192
+
 typedef struct s21_decimal {
   unsigned bits[4];
 } s21_decimal;
 
+typedef struct {
+  char bits[LONG_BITS];
+  char floa;
+  char sign;
+} s21_long_decimal;
+
+int s21_add(s21_decimal value1, s21_decimal value2, s21_decimal *result);
+int s21_sub(s21_decimal value1, s21_decimal value2, s21_decimal *result);
 int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 int s21_is_less(s21_decimal v1, s21_decimal v2);
 int s21_is_less_or_equal(s21_decimal v1, s21_decimal v2);
@@ -63,5 +73,35 @@ int divide_b_num_by_10(unsigned *n);
 void round_banks_decimal(unsigned *n, int digit, int *ex_current);
 _Bool add_digit_in_3_low_b_num(unsigned *n, int digit);
 void remove_all_zeros_from_b_num_if_div_10(unsigned *n, int *ex_current);
+
+// mushroot
+void s21_long_add(s21_long_decimal value1, s21_long_decimal value2,
+                  s21_long_decimal *result);
+void s21_long_sub(s21_long_decimal value1, s21_long_decimal value2,
+                  s21_long_decimal *result);
+s21_decimal s21_decimal_init();
+s21_long_decimal s21_long_init();
+void s21_decimal_to_long_decimal(s21_decimal value, s21_long_decimal *result);
+void s21_long_float_check(s21_long_decimal *value_1, s21_long_decimal *value_2);
+int s21_long_comparison(s21_long_decimal value_1, s21_long_decimal value_2);
+void s21_long_add(s21_long_decimal value_1, s21_long_decimal value_2,
+                  s21_long_decimal *result);
+void s21_long_sub(s21_long_decimal value_1, s21_long_decimal value_2,
+                  s21_long_decimal *result);
+s21_long_decimal s21_long_ten_init();
+void s21_long_to_decimal(s21_long_decimal value, s21_decimal *result);
+void s21_long_mul(s21_long_decimal value_1, s21_long_decimal value_2,
+                  s21_long_decimal *result);
+int s21_long_size_check(s21_long_decimal *value);
+s21_long_decimal s21_long_div(s21_long_decimal value_1,
+                              s21_long_decimal value_2,
+                              s21_long_decimal *result);
+int s21_long_size(s21_long_decimal value);
+void s21_long_bank_round(s21_long_decimal value, s21_long_decimal mod,
+                         s21_long_decimal *result);
+int s21_long_to_int(s21_long_decimal value);
+void s21_long_shift(s21_long_decimal *value);
+
+
 
 #endif
