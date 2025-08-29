@@ -46,8 +46,6 @@ int s21_from_decimal_to_int(s21_decimal src, int *dst) {
   int sign = s21_get_sign(src) ? -1 : 1;
   unsigned int scale = s21_get_exp(src);
 
-  int has_overflow = (src.bits[1] > 0 || src.bits[2] > 0);
-
   unsigned int values[3] = {src.bits[0], src.bits[1], src.bits[2]};
 
   for (unsigned int s = 0; s < scale; s++) {
@@ -59,6 +57,8 @@ int s21_from_decimal_to_int(s21_decimal src, int *dst) {
       remainder = (unsigned int)(temp % 10);
     }
   }
+
+  int has_overflow = (values[1] > 0 || values[2] > 0);
 
   if (values[1] > 0 || values[2] > 0) {
     has_overflow = 1;
@@ -151,6 +151,7 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst) {
   }
 
   dst->bits[3] |= (scale << 16);
+  remove_zero_if_div_10(dst, 28);
 
   return 0;
 }
