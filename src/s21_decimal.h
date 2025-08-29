@@ -41,7 +41,9 @@ int s21_from_int_to_decimal(int src, s21_decimal *dst);
 int s21_from_float_to_decimal(float src, s21_decimal *dst);
 int s21_from_decimal_to_int(s21_decimal src, int *dst);
 int s21_from_decimal_to_float(s21_decimal src, float *dst);
-
+int s21_floor(s21_decimal value, s21_decimal *result);
+int s21_round(s21_decimal value, s21_decimal *result);
+int s21_truncate(s21_decimal value, s21_decimal *result);
 int s21_negate(s21_decimal value, s21_decimal *result);
 
 // Dmitry
@@ -108,6 +110,9 @@ void s21_long_shift(s21_long_decimal *value);
 
 //charlesj
 int s21_is_zero96(const s21_decimal *d);
+
+//zoraidba
+_Bool add_digit(s21_decimal *value, unsigned digit);
 
 
 #endif
