@@ -605,16 +605,14 @@ s21_long_decimal s21_long_init() {
 
 void s21_decimal_to_long_decimal(s21_decimal value, s21_long_decimal *result) {
   *result = s21_long_init();
-  char *val_byte = (char *)value.bits;
-  result->floa = *(val_byte + 14);
-  result->sign = *(val_byte + 15);
   int counter = 0;
-  for (int i = 0; i < 12; i++) {
-    for (int j = 0; j < 8; j++) {
-      if (*(val_byte + i) & (1 << j)) result->bits[counter] = 1;
-      counter++;
+  for (int i = 0; i < 3; i++) { 
+    for (int j = 0; j < 32; j++) {
+      result->bits[counter++] = (value.bits[i] >> j) & 1;
     }
   }
+  result->sign = (value.bits[3] & (1u << 31)) ? 1 : 0;
+  result->floa = (value.bits[3] >> 16) & 0xFF;
 }
 
 void s21_long_float_check(s21_long_decimal *value_1,
@@ -704,14 +702,19 @@ s21_long_decimal s21_long_ten_init() {
 
 void s21_long_to_decimal(s21_long_decimal value, s21_decimal *result) {
   *result = s21_decimal_init();
-  char *res_byte = (char *)result->bits;
-  *(res_byte + 14) = value.floa;
-  *(res_byte + 15) = value.sign;
   int counter = 0;
-  for (int i = 0; i < 12; i++) {
-    for (int j = 0; j < 8; j++)
-      if (value.bits[counter++]) *(res_byte + i) += 1 << j;
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 32; j++) {
+      if (value.bits[counter++]) {
+        result->bits[i] |= (1u << j);
+      }
+    }
   }
+  result->bits[3] = 0;
+  if (value.sign) {
+    result->bits[3] |= (1u << 31);
+  }
+  result->bits[3] |= ((value.floa & 0xFF) << 16);
 }
 
 void s21_long_mul(s21_long_decimal value_1, s21_long_decimal value_2,
