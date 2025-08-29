@@ -876,19 +876,24 @@ void s21_big_round_div10_bankers(unsigned big[], int n, unsigned rem,
   }
 }
 
+void s21_zero_decimal(s21_decimal *d) {
+  d->bits[0] = d->bits[1] = d->bits[2] = d->bits[3] = 0u;
+}
+
 int s21_mul(s21_decimal a, s21_decimal b, s21_decimal *result) {
   int status = S21_OK;
 
   if (!result) {
     status = S21_INF_POS;
   } else {
-    s21_init(result);
+    s21_zero_decimal(result);
+
+    int sign = s21_get_sign(a) ^ s21_get_sign(b);
 
     if (s21_is_zero96(&a) || s21_is_zero96(&b)) {
       s21_set_exp(result, 0);
-      s21_set_sign(result, 0);
+      s21_set_sign(result, sign);
     } else {
-      int sign = s21_get_sign(a) ^ s21_get_sign(b);
       unsigned scale = (unsigned)s21_get_exp(a) + (unsigned)s21_get_exp(b);
 
       a.bits[3] = 0u;
@@ -908,17 +913,15 @@ int s21_mul(s21_decimal a, s21_decimal b, s21_decimal *result) {
         scale = 28u;
       }
 
-      {
-        int sticky = 0;
-        while (!s21_big_fits_96(big) && status == S21_OK) {
-          if (scale == 0u) {
-            status = sign ? S21_INF_NEG : S21_INF_POS;
-          } else {
-            unsigned rem = s21_big_div10(big, S21_LIMB_COUNT_192);
-            s21_big_round_div10_bankers(big, S21_LIMB_COUNT_192, rem, sticky);
-            if (rem != 0u) sticky = 1;
-            --scale;
-          }
+      int sticky = 0;
+      while (!s21_big_fits_96(big) && status == S21_OK) {
+        if (scale == 0u) {
+          status = sign ? S21_INF_NEG : S21_INF_POS;
+        } else {
+          unsigned rem = s21_big_div10(big, S21_LIMB_COUNT_192);
+          s21_big_round_div10_bankers(big, S21_LIMB_COUNT_192, rem, sticky);
+          if (rem != 0u) sticky = 1;
+          --scale;
         }
       }
 
@@ -927,10 +930,11 @@ int s21_mul(s21_decimal a, s21_decimal b, s21_decimal *result) {
         result->bits[1] = big[1];
         result->bits[2] = big[2];
 
-        if (result->bits[0] == 0u && result->bits[1] == 0u &&
+        if (result->bits[0] == 0u &&
+            result->bits[1] == 0u &&
             result->bits[2] == 0u) {
           s21_set_exp(result, 0);
-          s21_set_sign(result, 0);
+          s21_set_sign(result, sign);
         } else {
           s21_set_exp(result, (int)scale);
           s21_set_sign(result, sign);
@@ -938,6 +942,7 @@ int s21_mul(s21_decimal a, s21_decimal b, s21_decimal *result) {
       }
     }
   }
+
   return status;
 }
 
