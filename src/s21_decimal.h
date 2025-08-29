@@ -10,7 +10,7 @@ typedef struct
 
 typedef struct
 {
-    int bits[LONG_BITS];
+    char bits[LONG_BITS];
     char floa;
     char sign;
 } s21_long_decimal;
