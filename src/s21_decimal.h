@@ -13,6 +13,10 @@
 
 #define LONG_BITS 192
 
+enum { S21_OK = 0, S21_INF_POS = 1, S21_INF_NEG = 2, S21_DIV_BY_ZERO = 3 };
+enum { S21_LIMB_COUNT_192 = 6 };
+enum { S21_96_LIMBS = 3 };
+
 typedef struct s21_decimal {
   unsigned bits[4];
 } s21_decimal;
@@ -25,6 +29,7 @@ typedef struct {
 
 int s21_add(s21_decimal value1, s21_decimal value2, s21_decimal *result);
 int s21_sub(s21_decimal value1, s21_decimal value2, s21_decimal *result);
+int s21_mul(s21_decimal a, s21_decimal b, s21_decimal *result);
 int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 int s21_is_less(s21_decimal v1, s21_decimal v2);
 int s21_is_less_or_equal(s21_decimal v1, s21_decimal v2);
