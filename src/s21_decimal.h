@@ -47,7 +47,7 @@ int s21_truncate(s21_decimal value, s21_decimal *result);
 int s21_negate(s21_decimal value, s21_decimal *result);
 
 // Dmitry
-unsigned int s21_get_exponent(s21_decimal src);
+unsigned int s21_get_exp(s21_decimal src);
 int s21_get_sign(s21_decimal src);
 void s21_set_sign(s21_decimal *src, int sign);
 void s21_init(s21_decimal *dst);
@@ -108,7 +108,7 @@ void s21_long_bank_round(s21_long_decimal value, s21_long_decimal mod,
 int s21_long_to_int(s21_long_decimal value);
 void s21_long_shift(s21_long_decimal *value);
 
-//charlesj
+// charlesj
 int s21_is_zero96(const s21_decimal *d);
 void s21_zero_decimal(s21_decimal *d);
 int s21_mul(s21_decimal a, s21_decimal b, s21_decimal *result);
@@ -118,11 +118,13 @@ unsigned s21_big_inc(unsigned big[], int n);
 unsigned s21_big_div10(unsigned big[], int n);
 unsigned s21_big_mod10_const(const unsigned big[], int n);
 int s21_big_fits_96(const unsigned big[]);
-void s21_mul_96x96_to_192(const s21_decimal *x, const s21_decimal *y, unsigned out[], int n);
-void s21_big_round_div10_bankers(unsigned big[], int n, unsigned rem, int sticky);
+void s21_mul_96x96_to_192(const s21_decimal *x, const s21_decimal *y,
+                          unsigned out[], int n);
+void s21_big_round_div10_bankers(unsigned big[], int n, unsigned rem,
+                                 int sticky);
 
-//zoraidba
+// zoraidba
 _Bool add_digit(s21_decimal *value, unsigned digit);
-
+void s21_set_exp(s21_decimal *src, unsigned int exp);
 
 #endif

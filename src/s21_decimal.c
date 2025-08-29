@@ -1,41 +1,6 @@
 #include "s21_decimal.h"
-#include <assert.h>
 
-
-#define SIGNBIT 0x80000000 
-
-void print_decimal(s21_decimal d) {
-    printf("bits[0]: %u\n", d.bits[0]);
-    printf("bits[1]: %u\n", d.bits[1]);
-    printf("bits[2]: %u\n", d.bits[2]);
-    printf("bits[3]: %u\n", d.bits[3]);
-    printf("Знак: %s\n", (d.bits[3] & SIGNBIT) ? "Отрицательный" : "Положительный");
-}
-
-int main() {
-    s21_decimal result;
-    int boom = 6789;
-    int status = s21_from_int_to_decimal(boom, &result);
-
-    printf("%d\n", result.bits[0]);
-    printf("%d\n", result.bits[3]);
-    print_decimal(result);
-
-
-    s21_decimal decimal = {0}; 
-    float res = 0.0;
-    decimal.bits[0] = 1234;
-    decimal.bits[1] = 0;  
-    decimal.bits[2] = 0;
-    decimal.bits[3] = 0; 
-    s21_from_decimal_to_float(decimal, &res);
-    printf("%f\n", res);
-    return 0;
-};
-
-int s21_get_sign(s21_decimal src) {
-    return (src.bits[3] & SIGNBIT) ? 1 : 0;
-}
+int s21_get_sign(s21_decimal src) { return (src.bits[3] & SIGNBIT) ? 1 : 0; }
 
 void s21_set_sign(s21_decimal *src, int sign) {
   if (sign) {
@@ -46,20 +11,20 @@ void s21_set_sign(s21_decimal *src, int sign) {
 }
 
 int s21_negate(s21_decimal value, s21_decimal *result) {
-    int status = 0;
+  int status = 0;
 
-    if (result) {
-        *result = value;
-        s21_set_sign(result, !s21_get_sign(value));
-    } else {
-        status = 1;
-    }
+  if (result) {
+    *result = value;
+    s21_set_sign(result, !s21_get_sign(value));
+  } else {
+    status = 1;
+  }
 
-    return status;
+  return status;
 }
 
-void s21_zero_to_hero(s21_decimal *dst) {
-    dst->bits[0] = dst->bits[1] = dst->bits[2] = dst->bits[3] = 0;
+void s21_init(s21_decimal *dst) {
+  dst->bits[0] = dst->bits[1] = dst->bits[2] = dst->bits[3] = 0;
 }
 
 int s21_from_int_to_decimal(int src, s21_decimal *dst) {
@@ -81,7 +46,7 @@ int s21_from_decimal_to_int(s21_decimal src, int *dst) {
   if (!dst) return 1;
 
   int sign = s21_get_sign(src) ? -1 : 1;
-  unsigned int scale = s21_get_exponent(src);
+  unsigned int scale = s21_get_exp(src);
 
   int has_overflow = (src.bits[1] > 0 || src.bits[2] > 0);
 
@@ -132,7 +97,7 @@ int s21_from_decimal_to_float(s21_decimal src, float *dst) {
       factor *= 2.0;
     }
   }
-  unsigned int scale = s21_get_exponent(src);
+  unsigned int scale = s21_get_exp(src);
   for (unsigned int i = 0; i < scale; i++) {
     res /= 10.0;
   }
@@ -146,13 +111,55 @@ int s21_from_decimal_to_float(s21_decimal src, float *dst) {
 }
 
 int s21_from_float_to_decimal(float src, s21_decimal *dst) {
+  s21_init(dst);
 
+  if (isinf(src) || isnan(src) || (src > 0 && src < 1e-28) ||
+      (src < 0 && src > -1e-28)) {
+    s21_init(dst);
+    return 1;
+  }
+
+  if (src < 0) {
+    dst->bits[3] |= SIGNBIT;
+    src = -src;
+  }
+
+  unsigned int scale = 0;
+  while (src > 0 && src < 1000000.0 && scale < 28) {
+    src *= 10.0;
+    scale++;
+  }
+
+  unsigned int float_bits = *(unsigned int *)&src;
+  int float_exponent = ((float_bits >> 23) & 0xFF) - 127;
+  unsigned int mantissa = float_bits & 0x7FFFFF;  // 0-22
+
+  if (float_exponent >= 0) {
+    mantissa |= 0x800000;
+  }
+  if (mantissa != 0) {
+    for (int bit_pos = 23; bit_pos >= 0; bit_pos--) {
+      if (mantissa & (1U << bit_pos)) {
+        int target_pos = float_exponent - (23 - bit_pos);
+        if (target_pos >= 0 && target_pos < 96) {
+          int block = target_pos / 32;
+          int bit = target_pos % 32;
+          if (block < 3) {
+            dst->bits[block] |= (1U << bit);
+          }
+        }
+      }
+    }
+  }
+
+  dst->bits[3] |= (scale << 16);
+
+  return 0;
 }
 
-unsigned int s21_get_exp(s21_decimal src)
-{
-    src.bits[3] &= ~SIGNBIT; 
-    return src.bits[3] >> 16; 
+unsigned int s21_get_exp(s21_decimal src) {
+  src.bits[3] &= EXBITS;
+  return src.bits[3] >> 16;
 }
 
 // karkaror
@@ -523,8 +530,8 @@ void remove_all_zeros_from_b_num_if_div_10(unsigned *n, int *ex_current) {
 int s21_add(s21_decimal value1, s21_decimal value2, s21_decimal *result) {
   *result = s21_decimal_init();
   int error = 0;
-  s21_long_decimal longValue1;
-  s21_long_decimal longValue2;
+  s21_long_decimal longValue1 = {0};
+  s21_long_decimal longValue2 = {0};
   s21_long_decimal longResult = s21_long_init();
   s21_decimal_to_long_decimal(value1, &longValue1);
   s21_decimal_to_long_decimal(value2, &longValue2);
@@ -554,8 +561,8 @@ int s21_add(s21_decimal value1, s21_decimal value2, s21_decimal *result) {
 int s21_sub(s21_decimal value1, s21_decimal value2, s21_decimal *result) {
   *result = s21_decimal_init();
   int error = 0;
-  s21_long_decimal longValue1;
-  s21_long_decimal longValue2;
+  s21_long_decimal longValue1 = {0};
+  s21_long_decimal longValue2 = {0};
   s21_long_decimal longResult = s21_long_init();
   s21_decimal_to_long_decimal(value1, &longValue1);
   s21_decimal_to_long_decimal(value2, &longValue2);
@@ -588,7 +595,7 @@ s21_decimal s21_decimal_init() {
 }
 
 s21_long_decimal s21_long_init() {
-  s21_long_decimal value;
+  s21_long_decimal value = {0};
   for (int i = 0; i < LONG_BITS; i++) {
     value.bits[i] = 0;
   }
@@ -761,8 +768,8 @@ s21_long_decimal s21_long_div(s21_long_decimal value_1,
                               s21_long_decimal *result) {
   *result = s21_long_init();
   s21_long_decimal value_ten = s21_long_ten_init();
-  s21_long_decimal temp_divider;
-  s21_long_decimal temp_result;
+  s21_long_decimal temp_divider = {0};
+  s21_long_decimal temp_result = {0};
   int floa_1 = value_1.floa;
   int floa_2 = value_2.floa;
   value_1.floa = 0;
@@ -791,11 +798,7 @@ s21_long_decimal s21_long_div(s21_long_decimal value_1,
   return value_1;
 }
 
-//charlesj
-void s21_init(s21_decimal *d) {
-  d->bits[0] = d->bits[1] = d->bits[2] = d->bits[3] = 0u;
-}
-
+// charlesj
 int s21_is_zero96(const s21_decimal *d) {
   return d->bits[0] == 0u && d->bits[1] == 0u && d->bits[2] == 0u;
 }
@@ -880,7 +883,7 @@ int s21_mul(s21_decimal a, s21_decimal b, s21_decimal *result) {
   if (!result) {
     status = S21_INF_POS;
   } else {
-    s21_zero_decimal(result);
+    s21_init(result);
 
     if (s21_is_zero96(&a) || s21_is_zero96(&b)) {
       s21_set_exp(result, 0);
@@ -939,13 +942,13 @@ int s21_mul(s21_decimal a, s21_decimal b, s21_decimal *result) {
   return status;
 }
 
-//zoraidba
+// zoraidba
 int s21_floor(s21_decimal value, s21_decimal *result) {
   int error = 0;
 
-  if (result == NULL || s21_get_exp(*result) > 28) error = 1;
+  if (result == NULL || s21_get_exp(*result) > 28)
+    error = 1;
   else {
-    int largest_fractional_part = 0;
     *result = value;
     unsigned int scale = s21_get_exp(value);
     remove_zero_if_div_10(result, scale);
@@ -965,7 +968,8 @@ int s21_round(s21_decimal value, s21_decimal *result) {
   int error = 0;
   unsigned int scale = s21_get_exp(value);
 
-  if (result == NULL || s21_get_exp(*result) > 28) error = 1;
+  if (result == NULL || s21_get_exp(*result) > 28)
+    error = 1;
   else {
     int largest_fractional_part = 0;
     *result = value;
@@ -973,9 +977,9 @@ int s21_round(s21_decimal value, s21_decimal *result) {
     while ((scale--) != 0) {
       largest_fractional_part = divide_by_10(result);
     }
-      s21_set_exp(result, 0);
-      if (largest_fractional_part >= 5) add_digit(result, 1);
-    }
+    s21_set_exp(result, 0);
+    if (largest_fractional_part >= 5) add_digit(result, 1);
+  }
   return error;
 }
 
@@ -983,7 +987,8 @@ int s21_truncate(s21_decimal value, s21_decimal *result) {
   int error = 0;
   int scale = s21_get_exp(value);
 
-  if (result == NULL || s21_get_exp(*result) > 28) error = 1;  
+  if (result == NULL || s21_get_exp(*result) > 28)
+    error = 1;
   else {
     *result = value;
 
@@ -997,11 +1002,15 @@ int s21_truncate(s21_decimal value, s21_decimal *result) {
 }
 
 _Bool add_digit(s21_decimal *value, unsigned digit) {
-    unsigned long long overflow = (unsigned long long)digit;
-    for (int i = 0; i < 3; i++) {
-        overflow += (unsigned long long)value->bits[i];
-        value->bits[i] = (unsigned)overflow;
-        overflow = overflow >> 32;
-    }
-    return (overflow != 0ULL);
+  unsigned long long overflow = (unsigned long long)digit;
+  for (int i = 0; i < 3; i++) {
+    overflow += (unsigned long long)value->bits[i];
+    value->bits[i] = (unsigned)overflow;
+    overflow = overflow >> 32;
+  }
+  return (overflow != 0ULL);
+}
+
+void s21_set_exp(s21_decimal *src, unsigned int exp) {
+  src->bits[3] = (exp << 16) | (src->bits[3] & SIGNBIT);
 }
