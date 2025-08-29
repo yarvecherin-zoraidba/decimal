@@ -14,11 +14,10 @@ void s21_big_zero(unsigned big[], int n) {
 
 unsigned s21_big_inc(unsigned big[], int n) {
   unsigned long long carry = 1u;
-  for (int i = 0; i < n; ++i) {
+  for (int i = 0; i < n && carry; ++i) {
     unsigned long long sum = (unsigned long long)big[i] + carry;
     big[i] = (unsigned)(sum & 0xFFFFFFFFu);
     carry = sum >> 32;
-    if (!carry) break;
   }
   return (unsigned)carry;
 }
