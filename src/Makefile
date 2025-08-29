@@ -40,4 +40,4 @@ check_code:
 	cppcheck --enable=all --check-level=exhaustive --suppress=missingIncludeSystem *.c *.h
 
 stylize_code:
-	clang-format -i less_lessEq_greater.c less_lessEq_greater.h s21_test_less_lessEq_greater.c
+	clang-format -i *.c *.h

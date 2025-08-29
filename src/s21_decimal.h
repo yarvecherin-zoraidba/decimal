@@ -1,9 +1,13 @@
-#ifndef __less_lessEq_greater__
-#define __less_lessEq_greater__
+#ifndef __S21_DECIMAL_H__
+#define __S21_DECIMAL_H__
 
+#include <math.h>
 #include <stdio.h>
 
 #define SIGNBIT 0x80000000U
+#define MAX_INT 0x7FFFFFFF
+#define MIN_INT -2147483648
+
 #define EXBITS 0x00FF0000U
 #define NOT_VALIDBITS 0x7F00FFFFU
 
@@ -18,9 +22,22 @@ int s21_is_greater(s21_decimal v1, s21_decimal v2);
 int s21_is_greater_or_equal(s21_decimal v1, s21_decimal v2);
 int s21_is_equal(s21_decimal v1, s21_decimal v2);
 int s21_is_not_equal(s21_decimal v1, s21_decimal v2);
+int s21_from_int_to_decimal(int src, s21_decimal *dst);
+int s21_from_float_to_decimal(float src, s21_decimal *dst);
+int s21_from_decimal_to_int(s21_decimal src, int *dst);
+int s21_from_decimal_to_float(s21_decimal src, float *dst);
+
+int s21_negate(s21_decimal value, s21_decimal *result);
+
+// Dmitry
+unsigned int s21_get_exponent(s21_decimal src);
+int s21_get_sign(s21_decimal src);
+void s21_set_sign(s21_decimal *src, int sign);
+void s21_init(s21_decimal *dst);
+
+// karkaror
 _Bool is_OK_input_bits_data(const s21_decimal *v);
 _Bool is_zero_num(const s21_decimal *v);
-void set_zero_num(s21_decimal *v);
 int get_res_of_comparison(s21_decimal v1, s21_decimal v2);
 int compare_with_same_ex(s21_decimal v1, s21_decimal v2);
 int make_num_v1_greater_v2(s21_decimal *v1, int *ex1, s21_decimal v2);
