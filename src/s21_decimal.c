@@ -23,7 +23,7 @@ int s21_negate(s21_decimal value, s21_decimal *result) {
 }
 
 void s21_init(s21_decimal *dst) {
-  dst->bits[0] = dst->bits[1] = dst->bits[2] = dst->bits[3] = 0;
+  dst->bits[0] = dst->bits[1] = dst->bits[2] = dst->bits[3] = 0U;
 }
 
 int s21_from_int_to_decimal(int src, s21_decimal *dst) {
@@ -172,9 +172,9 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
   int ex2 = (int)(value_2.bits[3] & EXBITS) >> 16;
   ex2 = remove_zero_if_div_10(&value_2, ex2);
   int ex_result = 0;
-  if (is_zero_num(&value_2) == 1) {
+  if (s21_is_zero96(&value_2) == 1) {
     res = 3;
-  } else if (is_zero_num(&value_1) == 1) {
+  } else if (s21_is_zero96(&value_1) == 1) {
     s21_init(result);
     result->bits[3] |= sign;
   } else if ((ex_result = make_ex_1_2_zero(&value_1, &value_2, &ex1, &ex2)) <
@@ -222,10 +222,6 @@ _Bool is_OK_input_bits_data(const s21_decimal *v) {
     fl_is_ok_input = 0;
   }
   return fl_is_ok_input;
-}
-
-_Bool is_zero_num(const s21_decimal *v) {
-  return (v->bits[0] == 0U && v->bits[1] == 0U && v->bits[2] == 0U);
 }
 
 int get_res_of_comparison(s21_decimal v1, s21_decimal v2) {
@@ -799,3 +795,5 @@ s21_long_decimal s21_long_div(s21_long_decimal value_1,
     s21_long_mul(*result, value_ten, result);
   return value_1;
 }
+
+//charlesj

@@ -52,7 +52,6 @@ void s21_init(s21_decimal *dst);
 
 // karkaror
 _Bool is_OK_input_bits_data(const s21_decimal *v);
-_Bool is_zero_num(const s21_decimal *v);
 int get_res_of_comparison(s21_decimal v1, s21_decimal v2);
 int compare_with_same_ex(s21_decimal v1, s21_decimal v2);
 int make_num_v1_greater_v2(s21_decimal *v1, int *ex1, s21_decimal v2);
@@ -107,6 +106,8 @@ void s21_long_bank_round(s21_long_decimal value, s21_long_decimal mod,
 int s21_long_to_int(s21_long_decimal value);
 void s21_long_shift(s21_long_decimal *value);
 
+//charlesj
+int s21_is_zero96(const s21_decimal *d);
 
 
 #endif
