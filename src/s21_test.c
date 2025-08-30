@@ -863,18 +863,6 @@ START_TEST(test_mul_basic_small_ints) {
 }
 END_TEST
 
-// charlesj
-START_TEST(test_mul_basic_small_ints) {
-  s21_decimal a = make_dec(2u, 0u, 0u, 0u, 0);
-  s21_decimal b = make_dec(3u, 0u, 0u, 0u, 0);
-  s21_decimal got;
-  int rc = s21_mul(a, b, &got);
-  ck_assert_int_eq(rc, S21_OK);
-  s21_decimal exp = make_dec(6u, 0u, 0u, 0u, 0);
-  ck_assert(dec_eq(got, exp));
-}
-END_TEST
-
 START_TEST(test_mul_zero_left) {
   s21_decimal a = make_dec(0u, 0u, 0u, 0u, 0);
   s21_decimal b = make_dec(123456u, 0u, 0u, 0u, 0);
