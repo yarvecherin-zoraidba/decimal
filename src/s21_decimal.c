@@ -12,9 +12,9 @@ void s21_set_sign(s21_decimal *src, int sign) {
 
 int s21_negate(s21_decimal value, s21_decimal *result) {
   int status = 0;
-  if (result == NULL || s21_get_exp(value) > 28)
+  if (result == NULL || is_OK_input_bits_data(&value) == 0) {
     status = 1;
-  else {
+  } else {
     *result = value;
     s21_set_sign(result, !s21_get_sign(value));
   }
@@ -41,7 +41,9 @@ int s21_from_int_to_decimal(int src, s21_decimal *dst) {
 }
 
 int s21_from_decimal_to_int(s21_decimal src, int *dst) {
-  if (!dst) return 1;
+  if (dst == NULL || is_OK_input_bits_data(&src) == 0) {
+    return 1;
+  }
 
   int sign = s21_get_sign(src) ? -1 : 1;
   unsigned int scale = s21_get_exp(src);
@@ -82,8 +84,9 @@ int s21_from_decimal_to_int(s21_decimal src, int *dst) {
 }
 
 int s21_from_decimal_to_float(s21_decimal src, float *dst) {
-  if (!dst) return 1;
-
+  if (dst == NULL || is_OK_input_bits_data(&src) == 0) {
+    return 1;
+  }
   double res = 0.0;
   double factor = 1.0;
 
@@ -109,6 +112,9 @@ int s21_from_decimal_to_float(s21_decimal src, float *dst) {
 }
 
 int s21_from_float_to_decimal(float src, s21_decimal *dst) {
+  if (dst == NULL) {
+    return 1;
+  }
   s21_init(dst);
 
   if (isinf(src) || isnan(src) || (src > 0 && src < 1e-28) ||
@@ -193,26 +199,44 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
 }
 
 int s21_is_less(s21_decimal v1, s21_decimal v2) {
+  if (is_OK_input_bits_data(&v1) == 0 || is_OK_input_bits_data(&v2) == 0) {
+    return -1;
+  }
   return (get_res_of_comparison(v1, v2) < 0);
 }
 
 int s21_is_less_or_equal(s21_decimal v1, s21_decimal v2) {
+  if (is_OK_input_bits_data(&v1) == 0 || is_OK_input_bits_data(&v2) == 0) {
+    return -1;
+  }
   return (get_res_of_comparison(v1, v2) <= 0);
 }
 
 int s21_is_greater(s21_decimal v1, s21_decimal v2) {
+  if (is_OK_input_bits_data(&v1) == 0 || is_OK_input_bits_data(&v2) == 0) {
+    return -1;
+  }
   return (get_res_of_comparison(v1, v2) > 0);
 }
 
 int s21_is_greater_or_equal(s21_decimal v1, s21_decimal v2) {
+  if (is_OK_input_bits_data(&v1) == 0 || is_OK_input_bits_data(&v2) == 0) {
+    return -1;
+  }
   return (get_res_of_comparison(v1, v2) >= 0);
 }
 
 int s21_is_equal(s21_decimal v1, s21_decimal v2) {
+  if (is_OK_input_bits_data(&v1) == 0 || is_OK_input_bits_data(&v2) == 0) {
+    return -1;
+  }
   return (get_res_of_comparison(v1, v2) == 0);
 }
 
 int s21_is_not_equal(s21_decimal v1, s21_decimal v2) {
+  if (is_OK_input_bits_data(&v1) == 0 || is_OK_input_bits_data(&v2) == 0) {
+    return -1;
+  }
   return (get_res_of_comparison(v1, v2) != 0);
 }
 
@@ -527,6 +551,10 @@ void remove_all_zeros_from_b_num_if_div_10(unsigned *n, int *ex_current) {
 
 // mushroot
 int s21_add(s21_decimal value1, s21_decimal value2, s21_decimal *result) {
+  if (result == NULL || is_OK_input_bits_data(&value1) == 0 ||
+      is_OK_input_bits_data(&value2) == 0) {
+    return -1;
+  }
   *result = s21_decimal_init();
   int error = 0;
   s21_long_decimal longValue1 = {0};
@@ -558,6 +586,10 @@ int s21_add(s21_decimal value1, s21_decimal value2, s21_decimal *result) {
 }
 
 int s21_sub(s21_decimal value1, s21_decimal value2, s21_decimal *result) {
+  if (result == NULL || is_OK_input_bits_data(&value1) == 0 ||
+      is_OK_input_bits_data(&value2) == 0) {
+    return -1;
+  }
   *result = s21_decimal_init();
   int error = 0;
   s21_long_decimal longValue1 = {0};
@@ -606,7 +638,7 @@ s21_long_decimal s21_long_init() {
 void s21_decimal_to_long_decimal(s21_decimal value, s21_long_decimal *result) {
   *result = s21_long_init();
   int counter = 0;
-  for (int i = 0; i < 3; i++) { 
+  for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 32; j++) {
       result->bits[counter++] = (value.bits[i] >> j) & 1;
     }
@@ -884,68 +916,57 @@ void s21_zero_decimal(s21_decimal *d) {
 }
 
 int s21_mul(s21_decimal a, s21_decimal b, s21_decimal *result) {
+  if (result == NULL || is_OK_input_bits_data(&a) == 0 ||
+      is_OK_input_bits_data(&b) == 0) {
+    return -1;
+  }
   int status = S21_OK;
-
-  if (!result) {
-    status = S21_INF_POS;
+  s21_zero_decimal(result);
+  int sign = s21_get_sign(a) ^ s21_get_sign(b);
+  if (s21_is_zero96(&a) || s21_is_zero96(&b)) {
+    s21_set_exp(result, 0);
+    s21_set_sign(result, sign);
   } else {
-    s21_zero_decimal(result);
-
-    int sign = s21_get_sign(a) ^ s21_get_sign(b);
-
-    if (s21_is_zero96(&a) || s21_is_zero96(&b)) {
-      s21_set_exp(result, 0);
-      s21_set_sign(result, sign);
-    } else {
-      unsigned scale = (unsigned)s21_get_exp(a) + (unsigned)s21_get_exp(b);
-
-      a.bits[3] = 0u;
-      b.bits[3] = 0u;
-
-      unsigned big[S21_LIMB_COUNT_192];
-      s21_mul_96x96_to_192(&a, &b, big, S21_LIMB_COUNT_192);
-
-      if (scale > 28u) {
-        unsigned drop = scale - 28u;
-        int sticky = 0;
-        for (unsigned t = 0; t < drop; ++t) {
-          unsigned rem = s21_big_div10(big, S21_LIMB_COUNT_192);
-          s21_big_round_div10_bankers(big, S21_LIMB_COUNT_192, rem, sticky);
-          if (rem != 0u) sticky = 1;
-        }
-        scale = 28u;
-      }
-
+    unsigned scale = (unsigned)s21_get_exp(a) + (unsigned)s21_get_exp(b);
+    a.bits[3] = 0u;
+    b.bits[3] = 0u;
+    unsigned big[S21_LIMB_COUNT_192];
+    s21_mul_96x96_to_192(&a, &b, big, S21_LIMB_COUNT_192);
+    if (scale > 28u) {
+      unsigned drop = scale - 28u;
       int sticky = 0;
-      while (!s21_big_fits_96(big) && status == S21_OK) {
-        if (scale == 0u) {
-          status = sign ? S21_INF_NEG : S21_INF_POS;
-        } else {
-          unsigned rem = s21_big_div10(big, S21_LIMB_COUNT_192);
-          s21_big_round_div10_bankers(big, S21_LIMB_COUNT_192, rem, sticky);
-          if (rem != 0u) sticky = 1;
-          --scale;
-        }
+      for (unsigned t = 0; t < drop; ++t) {
+        unsigned rem = s21_big_div10(big, S21_LIMB_COUNT_192);
+        s21_big_round_div10_bankers(big, S21_LIMB_COUNT_192, rem, sticky);
+        if (rem != 0u) sticky = 1;
       }
-
-      if (status == S21_OK) {
-        result->bits[0] = big[0];
-        result->bits[1] = big[1];
-        result->bits[2] = big[2];
-
-        if (result->bits[0] == 0u &&
-            result->bits[1] == 0u &&
-            result->bits[2] == 0u) {
-          s21_set_exp(result, 0);
-          s21_set_sign(result, sign);
-        } else {
-          s21_set_exp(result, (int)scale);
-          s21_set_sign(result, sign);
-        }
+      scale = 28u;
+    }
+    int sticky = 0;
+    while (!s21_big_fits_96(big) && status == S21_OK) {
+      if (scale == 0u) {
+        status = sign ? S21_INF_NEG : S21_INF_POS;
+      } else {
+        unsigned rem = s21_big_div10(big, S21_LIMB_COUNT_192);
+        s21_big_round_div10_bankers(big, S21_LIMB_COUNT_192, rem, sticky);
+        if (rem != 0u) sticky = 1;
+        --scale;
+      }
+    }
+    if (status == S21_OK) {
+      result->bits[0] = big[0];
+      result->bits[1] = big[1];
+      result->bits[2] = big[2];
+      if (result->bits[0] == 0u && result->bits[1] == 0u &&
+          result->bits[2] == 0u) {
+        s21_set_exp(result, 0);
+        s21_set_sign(result, sign);
+      } else {
+        s21_set_exp(result, (int)scale);
+        s21_set_sign(result, sign);
       }
     }
   }
-
   return status;
 }
 
@@ -953,7 +974,7 @@ int s21_mul(s21_decimal a, s21_decimal b, s21_decimal *result) {
 int s21_floor(s21_decimal value, s21_decimal *result) {
   int error = 0;
 
-  if (result == NULL || s21_get_exp(value) > 28)
+  if (result == NULL || is_OK_input_bits_data(&value) == 0)
     error = 1;
   else {
     *result = value;
@@ -973,11 +994,11 @@ int s21_floor(s21_decimal value, s21_decimal *result) {
 
 int s21_round(s21_decimal value, s21_decimal *result) {
   int error = 0;
-  unsigned int scale = s21_get_exp(value);
 
-  if (result == NULL || s21_get_exp(value) > 28)
+  if (result == NULL || is_OK_input_bits_data(&value) == 0)
     error = 1;
   else {
+    unsigned int scale = s21_get_exp(value);
     int largest_fractional_part = 0;
     *result = value;
 
@@ -992,11 +1013,11 @@ int s21_round(s21_decimal value, s21_decimal *result) {
 
 int s21_truncate(s21_decimal value, s21_decimal *result) {
   int error = 0;
-  int scale = s21_get_exp(value);
 
-  if (result == NULL || s21_get_exp(value) > 28)
+  if (result == NULL || is_OK_input_bits_data(&value) == 0)
     error = 1;
   else {
+    int scale = s21_get_exp(value);
     *result = value;
 
     while ((scale--) != 0) {
