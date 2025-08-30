@@ -1636,7 +1636,7 @@ START_TEST(test_mul_null_result_ptr) {
   s21_decimal a = make_dec(1u, 0u, 0u, 0u, 0);
   s21_decimal b = make_dec(1u, 0u, 0u, 0u, 0);
   int rc = s21_mul(a, b, NULL);
-  ck_assert_int_eq(rc, S21_INF_POS);
+  ck_assert_int_eq(rc, -1);
 }
 END_TEST
 
